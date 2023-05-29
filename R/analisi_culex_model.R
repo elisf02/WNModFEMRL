@@ -34,7 +34,7 @@ MCMCFunc <- function(numero_cluster,
                      to_simulate=T,
                      to_write=T
 ) {
-  numero_catture=length(scan(vettore_date_catture,quiet=T))
+  length(scan(vettore_date_catture,quiet=T))
   cluster_simulati=numero_cluster
 
   if(to_mcmc)
