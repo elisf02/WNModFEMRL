@@ -84,8 +84,9 @@ MCMCFunc <- function(numero_cluster,
   }
   }
 
-PlotFunc <- function(anno_inizio = 2016,
-                     anno_fine = 2018,
+PlotFunc <- function(anno_inizio,
+                     anno_fine,
+                     numero_cluster,
                      nomi_parametri=c("Carrying capacity1",
                                       "Carrying capacity2",
                                       "Initial adults"),
@@ -143,8 +144,9 @@ PlotFunc <- function(anno_inizio = 2016,
 
 }
 
-PlotCheckK = function(anno_inizio = 2016,
-                      anno_fine = 2018,
+PlotCheckK = function(anno_inizio,
+                      anno_fine,
+                      numero_cluster,
                       OutLoc = 'Output/MCMC/Plots',
                       FilePlotName="confronto_carrying_capacity_70trappole",
                       nomi_parametri=c("Carrying capacity1",
@@ -208,8 +210,9 @@ PlotCheckK = function(anno_inizio = 2016,
 }
 
 
-SimuFunc = function(anno_inizio = 2016,
-                    anno_fine = 2018,
+SimuFunc = function(anno_inizio,
+                    anno_fine,
+                    numero_cluster,
 
                     numero_simulazioni=200,
 
@@ -311,8 +314,9 @@ SimuFunc = function(anno_inizio = 2016,
 }
 
 
-DynFunc <- function(anno_inizio = 2016,
-                    anno_fine = 2018,
+DynFunc <- function(anno_inizio,
+                    anno_fine,
+                    numero_cluster,
 
                     numero_classi_popolazione = 4,
                     classe_adulti=4,
