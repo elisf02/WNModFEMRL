@@ -1,0 +1,210 @@
+---
+title: "WNModFEMRL"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{WNModFEMRL}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(WNModFEMRL)
+```
+
+Package to simulate mosquito dynamics using FEM codes. 
+
+There are few functions to set up the files to use in the modelling framework.
+
+### preparatory functions
+These functions need a folder with the entomological surveillance files (from Regione Lombardia). 
+**Note** In RL database there are two sheets, you need to manually create two separate files: 
+- Estrazione dati entomologico WestNile *2016*
+- Siti entomologico *2016*
+
+<table>
+<tr  style="background-color: transparent">
+<th colspan = "3"; style= "font-size:110%"> Functions </th>
+<td> </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> **fileTemp** </td>
+<td colspan = "2"> *Function to prepare the temperature file from ARPA databases* </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *fileLoc* </td>
+  <td> folder where the db is (NB= the file needs to be one sheet only with the metadata) </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *fileNames* </td>
+  <td> vector containing the FULL name of all temperature files I want to merge </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *FileClus* </td>
+  <td> a file, that can be imported as data.frame, where I have the col=IdSensore and
+  a col Clus with the cluster associated to the sensor. Default = NA, meaning that the daily temperature is estimated as the mean over all the sensors.</td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *year* </td>
+  <td> must be a vec of all the years we want to include in the final .RDS file </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *OutLoc* </td>
+  <td> if non NA, folder where to save the file. If NA the file is not saved </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *OutName* </td>
+  <td> name of the created file </td>
+</tr>
+
+</table>
+
+
+
+
+### EntomoModel functions
+
+<table>
+<tr  style="background-color: transparent">
+<th colspan = "3"; style= "font-size:110%"> Functions </th>
+<td> </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> **MCMCFunc:** </td>
+<td colspan = "2"> *Function to simulate the dynamics of mosquitoes using FEM codes* </td>
+</tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *numero_cluster* </td>
+  <td> number of clusters to use for the simulation (NB needs to be the number of rows in the to_mcmc files) </td>
+</tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *anno_inizio* </td>
+  <td> first year of simulations </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *anno_fine* </td>
+  <td> first year of simulations </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *nomi_parametri* </td>
+  <td> Names of parameters that are estimated by the MCMC. Default paramters: "Carrying capacity1",  "Carrying capacity2", "Initial adults" </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *max_iter_MCMC* </td>
+  <td> Number max of iterations of the MCMC. Default = 1000 </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *sigma_big* </td>
+  <td> sigma (the big one) to be used in the simulations. Default = 5. </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *sigma_small* </td>
+  <td> sigma (the small one) to be used in the simulations. Default = 0.01. </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *sigma_big* </td>
+  <td> sigma (the big one) to be used in the simulations </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *seed* </td>
+  <td> seed to be used. Default = 0. </td>
+  </tr>
+  
+  <tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *file_temperatura* </td>
+  <td> name and folder of the file wiht mean daily temperature. The file is a .txt file with n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/temperatura_media_".  </td>
+  </tr>
+
+  <tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *file_catture* </td>
+  <td> name and folder of the file with the mean number of captured mosquitoes. The file is a .txt file with n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/catture_medie_cluster_".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *vettore_date_catture* </td>
+  <td> name and folder of the file with the days (giulian calendar number) in which the sampling was performed (for RL from day 90 to 300. Default = "per_mcmc/giorni_cattura.txt".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *file_luce* </td>
+  <td> file with the daily linght minutes (all the year). The file is a .txt file. Default = "per_mcmc/light_minutes.txt".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *OutLoc* </td>
+  <td> Folder where I want to save the output. NB it must contain a Plots folder. Default = "Output/MCMC".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *FileAllParmsName* </td>
+  <td> Name of the file where the MCMC will save parameter values. Default = "parametri_".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *FileParmsPerSimuName* </td>
+  <td> Name of the file where I want to save the values of paramters to be used to simulate. Default = "per_simulazione_".  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *to_plot* </td>
+  <td>T if I want to save the plots, F if not. Default = T.  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *to_mcmc* </td>
+  <td>T if I want to produce the MCMC, F if not. Default = T.  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *to_simulate* </td>
+  <td>T if I want to simulate, F if not. Default = T.  </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *to_write* </td>
+  <td>T if I want to write on a file the parametri_per_simulazione, F if not. Default = T.  </td>
+  </tr>
+</table>
+
+
