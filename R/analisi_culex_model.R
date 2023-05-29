@@ -34,13 +34,21 @@ MCMCFunc <- function(numero_cluster,
                      to_simulate=T,
                      to_write=T
 ) {
-  length(scan(vettore_date_catture,quiet=T))
+  numero_catture=length(scan(vettore_date_catture,quiet=T))
   cluster_simulati=numero_cluster
 
   if(to_mcmc)
-    system("gcc -o culex_mcmc codice/V1/2K_alphafix_betafix_constPerLik/mcmc_culex_main.c codice/V1/2K_alphafix_betafix_constPerLik/culex_func.c -lgsl -lgslcblas -lm")
+    system(paste("gcc -o culex_mcmc",
+                 system.file('templates/mcmc_culex_main.c', package = "WNModFEMRL"),
+                 system.file(' templates/culex_func.c', package = "WNModFEMRL"),
+                 "-lgsl -lgslcblas -lm"))
+  #system("gcc -o culex_mcmc templates/mcmc_culex_main.c templates/culex_func.c -lgsl -lgslcblas -lm")
   if(to_simulate)
-    system("gcc -o culex_simulation codice/V1/2K_alphafix_betafix_constPerLik/culex_simulation.c codice/V1/2K_alphafix_betafix_constPerLik/culex_func.c -lgsl -lgslcblas -lm")
+    system(paste("gcc -o culex_simulation",
+                 system.file('templates/culex_simulation.c', package = "WNModFEMRL"),
+                 system.file(' templates/culex_func.c', package = "WNModFEMRL"),
+                 "-lgsl -lgslcblas -lm"))
+  # system("gcc -o culex_simulation codice/V1/2K_alphafix_betafix_constPerLik/culex_simulation.c codice/V1/2K_alphafix_betafix_constPerLik/culex_func.c -lgsl -lgslcblas -lm")
 
   #### MCMC #####
   for(anno in anno_inizio:anno_fine){
