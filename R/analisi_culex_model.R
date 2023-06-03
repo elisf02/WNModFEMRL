@@ -5,50 +5,34 @@
 # graphics.off()
 # rm(list = ls())
 
-MCMCFunc <- function(numero_cluster,
-                     anno_inizio,
-                     anno_fine,
+ParmsEstimFunc <- function(numero_cluster,
+                           anno_inizio,
+                           anno_fine,
 
-                     nomi_parametri=c("Carrying capacity1",
-                                      "Carrying capacity2",
-                                      "Initial adults"),
+                           nomi_parametri=c("Carrying capacity1",
+                                            "Carrying capacity2",
+                                            "Initial adults"),
 
+                           solo_un_cluster=1,
+                           max_iter_MCMC=10000,
+                           sigma_big=5,
+                           sigma_small=0.01,
 
-                     max_iter_MCMC=10000,
-                     sigma_big=5,
-                     sigma_small=0.01,
+                           seed=0,
+                           file_temperatura="per_mcmc/temperatura_media_",
+                           file_catture="per_mcmc/catture_medie_cluster_",
+                           file_trappole="per_mcmc/trappole_attive_cluster_",
+                           vettore_date_catture="per_mcmc/giorni_cattura.txt",
+                           file_luce="per_mcmc/light_minutes.txt",
 
-                     seed=0,
-                     file_temperatura="per_mcmc/temperatura_media_",
-                     file_catture="per_mcmc/catture_medie_cluster_",
-                     file_trappole="per_mcmc/trappole_attive_cluster_",
-                     vettore_date_catture="per_mcmc/giorni_cattura.txt",
-                       file_luce="per_mcmc/light_minutes.txt",
-
-                     OutLoc = 'Output/MCMC',
-                     FileAllParmsName="parametri_",
-                     FileParmsPerSimuName="per_simulazione_",
-
-                     to_plot=T,
-                     to_mcmc=T,
-                     to_simulate=T,
-                     to_write=T
+                           OutLoc = 'Output/MCMC',
+                           FileAllParmsName="parametri_"
 ) {
-  numero_catture=length(scan(vettore_date_catture,quiet=T))
   cluster_simulati=numero_cluster
+  if(solo_un_cluster==1)
+    cluster_simulati=1
 
-  if(to_mcmc)
-    system(paste("gcc -o culex_mcmc",
-                 system.file('templates/mcmc_culex_main.c', package = "WNModFEMRL"),
-                 system.file(' templates/culex_func.c', package = "WNModFEMRL"),
-                 "-lgsl -lgslcblas -lm"))
-  #system("gcc -o culex_mcmc templates/mcmc_culex_main.c templates/culex_func.c -lgsl -lgslcblas -lm")
-  if(to_simulate)
-    system(paste("gcc -o culex_simulation",
-                 system.file('templates/culex_simulation.c', package = "WNModFEMRL"),
-                 system.file(' templates/culex_func.c', package = "WNModFEMRL"),
-                 "-lgsl -lgslcblas -lm"))
-  # system("gcc -o culex_simulation codice/V1/2K_alphafix_betafix_constPerLik/culex_simulation.c codice/V1/2K_alphafix_betafix_constPerLik/culex_func.c -lgsl -lgslcblas -lm")
+  numero_catture=length(scan(vettore_date_catture,quiet=T))
 
   #### MCMC #####
   for(anno in anno_inizio:anno_fine){
@@ -59,38 +43,57 @@ MCMCFunc <- function(numero_cluster,
                                  FileAllParmsName, anno, "_" ,quale_cluster,
                                  ".txt")
 
-      if(to_mcmc){
-        to_terminal=paste("time ./culex_mcmc",seed,file_temperatura,file_catture,file_trappole,numero_cluster,
-                          anno,anno,vettore_date_catture,numero_catture,nome_file_parametri,
-                          max_iter_MCMC,sigma_big,sigma_small,file_luce,solo_un_cluster,quale_cluster-1)
-        system(to_terminal)
+      to_terminal=paste("time",
+                        paste0(system.file(package = "WNModFEMRL"),'/templates/culex_mcmc'),
+                        seed,file_temperatura,file_catture,file_trappole,numero_cluster,
+                        anno,anno,vettore_date_catture,numero_catture,nome_file_parametri,
+                        max_iter_MCMC,sigma_big,sigma_small,file_luce,solo_un_cluster,quale_cluster-1)
+      system(to_terminal)
       }
+  }
+}
+SaveParmsPerSim <- function(numero_cluster,
+                            anno_inizio,
+                            anno_fine,
+
+                            nomi_parametri=c("Carrying capacity1",
+                                             "Carrying capacity2",
+                                             "Initial adults"),
+                            vettore_date_catture="per_mcmc/giorni_cattura.txt",
+                            solo_un_cluster = 1,
+
+
+                           OutLoc = 'Output/MCMC',
+                           FileAllParmsName="parametri_",
+                           FileParmsPerSimuName="per_simulazione_"
+) {
+  cluster_simulati=numero_cluster
+  if(solo_un_cluster==1)
+    cluster_simulati=1
+
+  numero_catture=length(scan(vettore_date_catture,quiet=T))
+  for(anno in anno_inizio:anno_fine){
+    print(paste("Simulo anno",anno))
+    for(quale_cluster in 1:numero_cluster){
+      print(paste("Cluster",quale_cluster))
+      nome_file_parametri=paste0(OutLoc, "/",
+                                 FileAllParmsName, anno, "_" ,quale_cluster,
+                                 ".txt")
 
       output_mcmc=read.table(nome_file_parametri)
       if(ncol(output_mcmc)<=1)
         output_mcmc=matrix(0,ncol=length(nomi_parametri)+1,nrow=max_iter_MCMC)
-      # plot(output_mcmc[,1],type="l",main="Capture rate")
-      # plot(output_mcmc[,2],type="l",main="beta")
-      # for(i in 3:(3+cluster_simulati-1))
-      #   plot(output_mcmc[,i],type="l",main=paste("K",i-2))
-      # for(i in (cluster_simulati+3):(ncol(output_mcmc)-1))
-      #   plot(output_mcmc[,i],type="l",main=paste("A0",i-2))
-      # plot(output_mcmc[,ncol(output_mcmc)],type="l",main="LogLik")
       burnin=nrow(output_mcmc)*0.1
-      # plot(output_mcmc[-c(1:burnin),ncol(output_mcmc)],type="l",main="LogLik")
-
-      # parametri_per_simulazione=paste0("Output/MCMC/per_simulazione_",anno,"_WNV5reg_alphaFix_constPerLik_70trappole_",quale_cluster,".txt")
       parametri_per_simulazione=paste0(OutLoc, "/",
                                        FileParmsPerSimuName, anno, "_" , quale_cluster,
-                                 ".txt")
+                                       ".txt")
 
-      if(to_write)
         write.table(output_mcmc[-c(1:burnin),-ncol(output_mcmc)],
                     row.names=F,col.names=F,file=parametri_per_simulazione)
 
-      }
+    }
   }
-  }
+}
 
 PlotFunc <- function(anno_inizio,
                      anno_fine,
@@ -98,10 +101,9 @@ PlotFunc <- function(anno_inizio,
                      nomi_parametri=c("Carrying capacity1",
                                       "Carrying capacity2",
                                       "Initial adults"),
-                     OutLoc = 'Output/MCMC/Plots',
+                     OutLoc = 'Output/MCMC',
                      FileAllParmsName="parametri_",
                      FileParmsPerSimuName="per_simulazione_"
-
 ) {
   # source("myR.R")
 
@@ -115,6 +117,8 @@ PlotFunc <- function(anno_inizio,
                                  FileAllParmsName, anno, "_" ,quale_cluster,
                                  ".txt")
       output_mcmc=read.table(nome_file_parametri)
+      burnin=nrow(output_mcmc)*0.1
+
       if(ncol(output_mcmc)<=1)
         output_mcmc=matrix(0,ncol=length(nomi_parametri)+1,nrow=max_iter_MCMC)
       for(j in 1:(ncol(output_mcmc)-1))
@@ -122,7 +126,7 @@ PlotFunc <- function(anno_inizio,
     }
 
     #nome_file=paste0("Output/MCMC/Plots/5reg/parametri_2K_WNV5reg_alphabetaFix_constPerLik_70trappole_",anno,".jpg")
-    nome_file=paste0(OutLoc, "/",
+    nome_file=paste0(OutLoc, "/Plots/",
                      FileAllParmsName, anno, "_" ,quale_cluster,
                      ".jpg")
     jpeg(nome_file,width=length(nomi_parametri)*1200,height=1000,res=200)
@@ -155,8 +159,8 @@ PlotFunc <- function(anno_inizio,
 PlotCheckK = function(anno_inizio,
                       anno_fine,
                       numero_cluster,
-                      OutLoc = 'Output/MCMC/Plots',
-                      FilePlotName="confronto_carrying_capacity_70trappole",
+                      OutLoc = 'Output/MCMC',
+                      FilePlotName="confronto_carrying_capacity",
                       nomi_parametri=c("Carrying capacity1",
                                        "Carrying capacity2",
                                        "Initial adults"),
@@ -168,9 +172,9 @@ PlotCheckK = function(anno_inizio,
   ### check carrying capacity
   # source("../myR.R")
   library(RColorBrewer)
-  colori=brewer.pal(numero_cluster,"Set1")
+  colori=brewer.pal(ifelse(numero_cluster >=3, numero_cluster,3),"Set1")
 
-  nome_file=paste0(OutLoc, "/", FilePlotName, ".jpg")
+  nome_file=paste0(OutLoc, "/Plots/", FilePlotName, ".jpg")
   jpeg(nome_file,width=3*1200,height=2*1000,res=200)
   par(mfrow=c(2,3),cex.axis=2,mar=c(4,8,4,2),cex.lab=2,cex.main=2)
 
@@ -214,6 +218,7 @@ PlotCheckK = function(anno_inizio,
          labels=format(seq(ymin,ymax,length.out=4),scientific=T,digits=2))
     axis(1,at=c(1:ncol(tab)),labels=LETTERS[1:numero_cluster])
   }
+  dev.off()
 
 }
 
@@ -233,15 +238,26 @@ SimuFunc = function(anno_inizio,
                     FileDynName = "dynamics_",
                     FileCaptName = "catture_",
 
+                    solo_un_cluster =1,
                     seed=0,
                     file_temperatura="per_mcmc/temperatura_media_",
                     file_catture="per_mcmc/catture_medie_cluster_",
                     file_trappole="per_mcmc/trappole_attive_cluster_",
                     vettore_date_catture="per_mcmc/giorni_cattura_cluster.txt",
-                    file_luce="per_mcmc/light_minutes.txt"
-                    ){
+                    file_luce="per_mcmc/light_minutes.txt",
+                    cex_points = 1.2,
+                    cex_axes = 1.2,
+                    cex_lab_axes = 1.2,
+                    margins_plot = c(5,5,2,2)
+){
   #### Simulazioni ####
   settimane=scan(vettore_date_catture)
+  numero_catture=length(scan(vettore_date_catture,quiet=T))
+
+  cluster_simulati=numero_cluster
+  if(solo_un_cluster==1)
+    cluster_simulati=1
+
   # settimane=settimane[-c(20:22)]
 
   cor_test_tab=c()
@@ -249,12 +265,13 @@ SimuFunc = function(anno_inizio,
 
   for(anno in anno_inizio:anno_fine){
     print(paste("Simulo anno",anno))
-    if(to_plot){
-      nome_file=paste0(OutLoc, "/", Filename, "_", anno, ".jpg")
-      jpeg(nome_file,width=numero_cluster*1200,height=1000,res=200)
-      # par(mfrow=c(1,numero_cluster),mar=c(5,8,2,2),cex.lab=1.5,cex.main=2,cex.axis=2.5)
-      par(mfrow=c(1,numero_cluster),mar=c(5,10,2,2),cex.lab=1.5,cex.main=2,cex.axis=2.5)
-    }
+    nome_file=paste0(OutLoc, "/Plots/", Filename, "_", anno, ".jpg")
+    jpeg(nome_file,width=numero_cluster*1200,height=1000,res=200)
+    # par(mfrow=c(1,numero_cluster),mar=c(5,8,2,2),cex.lab=1.5,cex.main=2,cex.axis=2.5)
+    par(mfrow=c(1,numero_cluster),mar=margins_plot,
+        cex.lab=1.5,
+        cex.main=2,
+        cex.axis=cex_axes)
     cor_test_tmp=c()
     for(quale_cluster in 1:numero_cluster){
       parametri_per_simulazione=paste0(FileParmsLoc, "/",
@@ -266,11 +283,13 @@ SimuFunc = function(anno_inizio,
       ncol_file_parametri=ncol(read.table(parametri_per_simulazione))
       nrow_file_parametri=nrow(read.table(parametri_per_simulazione))
 
-      to_terminal=paste("time ./culex_simulation",seed,file_temperatura,file_catture,file_trappole,numero_cluster,
-                          anno,anno,vettore_date_catture,numero_catture,nome_file_output_dynamics,
-                          nome_file_output_catture,numero_simulazioni,
-                          parametri_per_simulazione,ncol_file_parametri,nrow_file_parametri,file_luce,solo_un_cluster,
-                          quale_cluster-1)
+      to_terminal=paste("time",
+                        paste0(system.file(package = "WNModFEMRL"),'/templates/culex_simulation'),
+                        seed,file_temperatura,file_catture,file_trappole,numero_cluster,
+                        anno,anno,vettore_date_catture,numero_catture,nome_file_output_dynamics,
+                        nome_file_output_catture,numero_simulazioni,
+                        parametri_per_simulazione,ncol_file_parametri,nrow_file_parametri,file_luce,solo_un_cluster,
+                        quale_cluster-1)
       system(to_terminal)
 
       catture_simulate=read.table(nome_file_output_catture)
@@ -306,21 +325,19 @@ SimuFunc = function(anno_inizio,
       for(j in 1:ncol(simu_sel)){
         if(trappole_attive[quale_cluster,j]==1){
           # plotbox(w=settimane[j],X=simu_sel[,j],fun=median,wd=2)
-          points(settimane[j],catture_osservate[quale_cluster,j],pch=19,col="darkgreen",cex=2)
+          points(settimane[j],catture_osservate[quale_cluster,j],pch=19,col="darkgreen",cex=cex_points)#2)
         }
       }
       # axis(1,at=seq(xmin,xmax,28),labels=seq(xmin,xmax,28)/7)
       axis(1,at=seq(xmin,xmax,60),labels=month.abb[seq(4,10,2)])
       axis(2,at=round(seq(ymin,ymax,length.out=4)),las=2)
-      mtext(side=2,text="Captured Cx. pipiens",line=7.5,cex=1.75)
-      mtext(side=1,text="Week",line=3.5,cex=1.75)
+      mtext(side=2,text="Captured Cx. pipiens",line=3.5,cex=cex_lab_axes)#1.75)
+      mtext(side=1,text="Week",line=3,cex=cex_lab_axes)#1.75)
     }
     cor_test_tab=rbind(cor_test_tab,cor_test_tmp)
-    if(to_plot)
-      dev.off()
+    dev.off()
   }
 }
-
 
 DynFunc <- function(anno_inizio,
                     anno_fine,
@@ -331,20 +348,23 @@ DynFunc <- function(anno_inizio,
 
                     nome_classi = c("E","L","P","A"),
                     OutLoc = "Output/Simulazioni",
-                    OutZanzMedieLoc = "../Modello WNV/per_mcmc/zanzare",
+                    OutZanzMedieLoc = "per_mcmc/zanzare",
                     FileDynName = "dynamics_",
-                    FileZanzMedieName = " adulti_medi_",
-                    PlotOutLoc = "Output/Simulazioni/Plots",
-                    PlotDynName = "dinamica_adulti_") {
+                    FileZanzMedieName = "adulti_medi_",
+                    PlotDynName = "dinamica_adulti_",
+                    cex_points = 1.2,
+                    cex_axes = 1.2,
+                    cex_lab_axes = 1.2,
+                    margins_plot = c(5,5,2,2)) {
   message('adults dynamics')
   ##### dinamica solo adulti
   for(anno in anno_inizio:anno_fine){
     print(paste("Anno",anno))
 
-    nome_file=paste0(PlotOutLoc, "/",
+    nome_file=paste0(OutLoc, "/Plots/",
                      PlotDynName, anno, ".jpg")
     jpeg(nome_file,width=numero_cluster*1200,height=1000,res=200)
-    par(mfrow=c(1,numero_cluster),mar=c(5,10,2,2),cex.lab=1.5,cex.main=2,cex.axis=2.5)
+    par(mfrow=c(1,numero_cluster),mar=c(5,10,2,2),cex.lab=1.5,cex.main=2,cex.axis=cex_axes)
 
     for(quale_cluster in 1:numero_cluster){
       nome_file_output_dynamics=paste0(OutLoc, "/",
@@ -352,7 +372,7 @@ DynFunc <- function(anno_inizio,
 
       dinamica_simulata=read.table(nome_file_output_dynamics)
 
-      classe=4
+      classe=classe_adulti=4
 
       simu_sel=dinamica_simulata[seq(classe,nrow(dinamica_simulata),
                                      numero_classi_popolazione),1:180]
@@ -378,8 +398,9 @@ DynFunc <- function(anno_inizio,
       axis(1,at=seq(xmin,xmax,60),labels=month.abb[seq(4,10,2)])
       axis(2,at=round(seq(ymin,ymax,length.out=4)),las=2,
            labels=format(round(seq(ymin,ymax,length.out=4)),scientific=T,digits=1))
-      mtext(side=2,text="Cx. pipiens females",line=7.5,cex=2)
+      mtext(side=2,text="Cx. pipiens females",line=3.5,cex=2)
     }
+    dev.off()
   }
 
   ##### salvo adulti per modello WNV
@@ -403,13 +424,8 @@ DynFunc <- function(anno_inizio,
 
     nome_file=paste0(OutZanzMedieLoc, "/",
                      FileZanzMedieName,
-                     "_", anno)
-    if(to_write)
-      write.table(adulti_medi,file=nome_file,row.names=F,col.names=F)
+                     anno)
+    write.table(adulti_medi,file=nome_file,row.names=F,col.names=F)
   }
 
 }
-
-
-
-

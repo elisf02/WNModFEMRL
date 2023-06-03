@@ -22,7 +22,20 @@ Package to simulate mosquito dynamics using FEM codes.
 
 There are few functions to set up the files to use in the modelling framework.
 
-### preparatory functions
+### Necessary
+Before simulating the ENTOMOLOGICAL model I need to prepare the following folders
+
+* **per_mcmc** = folder with the files for the MCMC (i.e - a *Mean Temperatures* file for each year, where each line is the daily mean temperature in one cluster - a *Mean Culex* file for each year, where each line is the daily mean number of collected culex in one cluster - a *Open* file for each year, where each line is the opening (=1) or closure (=0) in one cluster - a *Giorni_cattura.txt* file with in a column all the opening days (Giulian calendar) - a *light_minutes* file with in a column all the light minutes from day 1 to 365 (Giulian calendar)
+
+* *per_mcmc/***zanzare**
+* **Output**
+* *Output/***MCMC**
+* *Output/MCMC/***Plots**
+* *Output/***Simulazioni**
+* *Output/Simulazioni/***Plots**
+
+
+### Preparatory functions
 These functions need a folder with the entomological surveillance files (from Regione Lombardia). 
 **Note** In RL database there are two sheets, you need to manually create two separate files: 
 - Estrazione dati entomologico WestNile *2016*
@@ -76,14 +89,17 @@ These functions need a folder with the entomological surveillance files (from Re
 
 ### EntomoModel functions
 
+*Elenco provvisorio:*
+
+
 <table>
 <tr  style="background-color: transparent">
 <th colspan = "3"; style= "font-size:110%"> Functions </th>
 <td> </td>
 </tr>
 <tr style="vertical-align: top; class:noBorder" >
-<td> **MCMCFunc:** </td>
-<td colspan = "2"> *Function to simulate the dynamics of mosquitoes using FEM codes* </td>
+<td> **ParmsEstimFunc:** </td>
+<td colspan = "2"> *Function to esimate the parameters (MCMC) for mosquito dynamics using FEM codes* </td>
 </tr>
 
 <tr style="vertical-align: top; class:noBorder" >
@@ -112,6 +128,12 @@ These functions need a folder with the entomological surveillance files (from Re
 
 <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
+<td> *solo_un_cluster* </td>
+  <td> Necessary to simulate. Default = 1: **Do not change**. </td>
+  </tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
 <td> *max_iter_MCMC* </td>
   <td> Number max of iterations of the MCMC. Default = 1000 </td>
   </tr>
@@ -130,12 +152,6 @@ These functions need a folder with the entomological surveillance files (from Re
 
 <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
-<td> *sigma_big* </td>
-  <td> sigma (the big one) to be used in the simulations </td>
-  </tr>
-
-<tr style="vertical-align: top; class:noBorder" >
-<td> </td>
 <td> *seed* </td>
   <td> seed to be used. Default = 0. </td>
   </tr>
@@ -143,13 +159,19 @@ These functions need a folder with the entomological surveillance files (from Re
   <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
 <td> *file_temperatura* </td>
-  <td> name and folder of the file wiht mean daily temperature. The file is a .txt file with n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/temperatura_media_".  </td>
+  <td> name and folder of the file with mean daily temperature. The file is a .txt file with n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/temperatura_media_".  </td>
   </tr>
 
   <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
 <td> *file_catture* </td>
   <td> name and folder of the file with the mean number of captured mosquitoes. The file is a .txt file with n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/catture_medie_cluster_".  </td>
+  </tr>
+
+  <tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *file_trappole* </td>
+  <td> name and folder of the file with the opening of the traps each "giorno_catture" (1 = open trap in the cluster, 0 = close). n.rows = n.clusters. The full name of the file includes the year, but the function adds the year and the extension to the given file name. Default = "per_mcmc/catture_medie_cluster_".  </td>
   </tr>
 
 <tr style="vertical-align: top; class:noBorder" >
@@ -177,34 +199,55 @@ These functions need a folder with the entomological surveillance files (from Re
   </tr>
 
 <tr style="vertical-align: top; class:noBorder" >
-<td> </td>
-<td> *FileParmsPerSimuName* </td>
-  <td> Name of the file where I want to save the values of paramters to be used to simulate. Default = "per_simulazione_".  </td>
-  </tr>
+<td> **SaveParmsPerSim** </td>
+<td colspan = "2"> *burinin e parametri per simulazione* </td>
+</tr>
 
 <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
-<td> *to_plot* </td>
-  <td>T if I want to save the plots, F if not. Default = T.  </td>
-  </tr>
-
+<td> *...devo farlo* </td>
+  <td> ... </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> **PlotFunc** </td>
+<td colspan = "2"> *Plots* </td>
+</tr>
 <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
-<td> *to_mcmc* </td>
-  <td>T if I want to produce the MCMC, F if not. Default = T.  </td>
-  </tr>
+<td> *...devo farlo* </td>
+  <td> ... </td>
+</tr>
 
 <tr style="vertical-align: top; class:noBorder" >
-<td> </td>
-<td> *to_simulate* </td>
-  <td>T if I want to simulate, F if not. Default = T.  </td>
-  </tr>
-
+<td> **PlotCheckK** </td>
+<td colspan = "2"> *Plots* </td>
+</tr>
 <tr style="vertical-align: top; class:noBorder" >
 <td> </td>
-<td> *to_write* </td>
-  <td>T if I want to write on a file the parametri_per_simulazione, F if not. Default = T.  </td>
-  </tr>
+<td> *...devo farlo* </td>
+  <td> ... </td>
+</tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> **SimuFunc** </td>
+<td colspan = "2"> *Simulations mosqiuto pop dyn* </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *...devo farlo* </td>
+  <td> ... </td>
+</tr>
+
+<tr style="vertical-align: top; class:noBorder" >
+<td> **DynFunc** </td>
+<td colspan = "2"> *Simulations mosqiuto pop dyn* </td>
+</tr>
+<tr style="vertical-align: top; class:noBorder" >
+<td> </td>
+<td> *...devo farlo* </td>
+  <td> ... </td>
+</tr>
+
 </table>
 
 
