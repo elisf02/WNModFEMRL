@@ -91,6 +91,17 @@ These functions need a folder with the entomological surveillance files (from Re
 
 *Elenco provvisorio:*
 
+- ENTO_ParmsEstimFunc
+
+- ENTO_SaveParmsPerSim
+
+- ENTO_PlotFunc
+
+- ENTO_PlotCheckK
+
+- ENTO_SimuFunc
+
+- ENTO_DynFunc
 
 <table>
 <tr  style="background-color: transparent">
@@ -250,4 +261,10 @@ These functions need a folder with the entomological surveillance files (from Re
 
 </table>
 
+### Epidemio funcs
 
+- WN_MCMC_and_Simu
+
+- WN_PlotModelFit
+
+- WN_PlotDynamics

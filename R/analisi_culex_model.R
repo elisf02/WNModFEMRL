@@ -5,13 +5,9 @@
 # graphics.off()
 # rm(list = ls())
 
-ParmsEstimFunc <- function(numero_cluster,
+ENTO_ParmsEstimFunc <- function(numero_cluster,
                            anno_inizio,
                            anno_fine,
-
-                           nomi_parametri=c("Carrying capacity1",
-                                            "Carrying capacity2",
-                                            "Initial adults"),
 
                            solo_un_cluster=1,
                            max_iter_MCMC=10000,
@@ -28,6 +24,11 @@ ParmsEstimFunc <- function(numero_cluster,
                            OutLoc = 'Output/MCMC',
                            FileAllParmsName="parametri_"
 ) {
+
+  nomi_parametri=c("Carrying capacity1",
+                   "Carrying capacity2",
+                   "Initial adults")
+
   cluster_simulati=numero_cluster
   if(solo_un_cluster==1)
     cluster_simulati=1
@@ -52,13 +53,9 @@ ParmsEstimFunc <- function(numero_cluster,
       }
   }
 }
-SaveParmsPerSim <- function(numero_cluster,
+ENTO_SaveParmsPerSim <- function(numero_cluster,
                             anno_inizio,
                             anno_fine,
-
-                            nomi_parametri=c("Carrying capacity1",
-                                             "Carrying capacity2",
-                                             "Initial adults"),
                             vettore_date_catture="per_mcmc/giorni_cattura.txt",
                             solo_un_cluster = 1,
 
@@ -67,6 +64,10 @@ SaveParmsPerSim <- function(numero_cluster,
                            FileAllParmsName="parametri_",
                            FileParmsPerSimuName="per_simulazione_"
 ) {
+  nomi_parametri=c("Carrying capacity1",
+                   "Carrying capacity2",
+                   "Initial adults")
+
   cluster_simulati=numero_cluster
   if(solo_un_cluster==1)
     cluster_simulati=1
@@ -95,16 +96,16 @@ SaveParmsPerSim <- function(numero_cluster,
   }
 }
 
-PlotFunc <- function(anno_inizio,
+ENTO_PlotFunc <- function(anno_inizio,
                      anno_fine,
                      numero_cluster,
-                     nomi_parametri=c("Carrying capacity1",
-                                      "Carrying capacity2",
-                                      "Initial adults"),
                      OutLoc = 'Output/MCMC',
                      FileAllParmsName="parametri_",
                      FileParmsPerSimuName="per_simulazione_"
 ) {
+  nomi_parametri=c("Carrying capacity1",
+                   "Carrying capacity2",
+                   "Initial adults")
   # source("myR.R")
 
   for(anno in anno_inizio:anno_fine){
@@ -156,19 +157,20 @@ PlotFunc <- function(anno_inizio,
 
 }
 
-PlotCheckK = function(anno_inizio,
+ENTO_PlotCheckK = function(anno_inizio,
                       anno_fine,
                       numero_cluster,
                       OutLoc = 'Output/MCMC',
                       FilePlotName="confronto_carrying_capacity",
-                      nomi_parametri=c("Carrying capacity1",
-                                       "Carrying capacity2",
-                                       "Initial adults"),
+
                       FileAllParmsName="parametri_"
 
 
 
 ) {
+  nomi_parametri=c("Carrying capacity1",
+                   "Carrying capacity2",
+                   "Initial adults")
   ### check carrying capacity
   # source("../myR.R")
   library(RColorBrewer)
@@ -223,7 +225,7 @@ PlotCheckK = function(anno_inizio,
 }
 
 
-SimuFunc = function(anno_inizio,
+ENTO_SimuFunc = function(anno_inizio,
                     anno_fine,
                     numero_cluster,
 
@@ -339,14 +341,10 @@ SimuFunc = function(anno_inizio,
   }
 }
 
-DynFunc <- function(anno_inizio,
+ENTO_DynFunc <- function(anno_inizio,
                     anno_fine,
                     numero_cluster,
 
-                    numero_classi_popolazione = 4,
-                    classe_adulti=4,
-
-                    nome_classi = c("E","L","P","A"),
                     OutLoc = "Output/Simulazioni",
                     OutZanzMedieLoc = "per_mcmc/zanzare",
                     FileDynName = "dynamics_",
@@ -357,6 +355,12 @@ DynFunc <- function(anno_inizio,
                     cex_lab_axes = 1.2,
                     margins_plot = c(5,5,2,2)) {
   message('adults dynamics')
+
+  numero_classi_popolazione = 4
+  classe_adulti=4
+
+  nome_classi = c("E","L","P","A")
+
   ##### dinamica solo adulti
   for(anno in anno_inizio:anno_fine){
     print(paste("Anno",anno))
