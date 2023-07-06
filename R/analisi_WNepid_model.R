@@ -456,5 +456,45 @@ WN_PlotDynamics <- function(anno_inizio,
 
 
 
+CheckMCMC = function(InLoc = "Output_WNV/MCMC/",
+                     FileName = "parametri_",
+                     anno,
+                     quale_cluster,
 
+                     OnFile = T,
+                     OutLoc = "Output_WNV/MCMC/Plots/",
+                     OutFileName = "Check_Lik_",
+                     con_cosa_inizio = 1){
+  nomi_parametri=c("p","B0","pR","b1",# "b2",
+                   "muB",
+                   "s", "phi", "niB", "recB")
+
+
+  if(con_cosa_inizio==0)
+    nome_file_parametri=paste0(InLoc, FileName, "B_",
+                               anno,"_",quale_cluster,".txt")
+  if(con_cosa_inizio==1)
+    nome_file_parametri=paste0(InLoc, FileName, "M_",
+                               anno,"_",quale_cluster,".txt")
+
+  output_mcmc=read.table(nome_file_parametri)
+  if(ncol(output_mcmc)<=1)
+    output_mcmc=matrix(0,ncol=length(nomi_parametri)+1,nrow=max_iter_MCMC)
+  nomi_parametri_plot=c(nomi_parametri,"LogLik")
+
+  nome_file = paste0(OutLoc, OutFileName, "_",
+                     anno,"_",quale_cluster,".jpg")
+  if(OnFile) {
+    jpeg(nome_file,width=4*1200,height=1000*3,res=200)
+    par(mfrow=c(3,4),cex.axis=1.5,mar=c(4,6,2,2),cex.lab=1.5,cex.main=1.5)
+
+    for(j in 1:length(nomi_parametri_plot))
+      plot(output_mcmc[,j],type="l",main=nomi_parametri_plot[j])
+    dev.off()
+  }
+
+  par(mfrow=c(2,2))
+  for(j in 1:length(nomi_parametri_plot))
+    plot(output_mcmc[,j],type="l",main=nomi_parametri_plot[j])
+}
 

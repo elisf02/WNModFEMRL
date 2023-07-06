@@ -270,3 +270,5 @@ These functions need a folder with the entomological surveillance files (from Re
 - WN_PlotModelFit
 
 - WN_PlotDynamics
+
+- CheckMCMC
