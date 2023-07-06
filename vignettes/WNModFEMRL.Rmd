@@ -265,6 +265,8 @@ These functions need a folder with the entomological surveillance files (from Re
 
 - WN_MCMC_and_Simu
 
+- WNV_ParPlotFunc
+
 - WN_PlotModelFit
 
 - WN_PlotDynamics
