@@ -272,3 +272,14 @@ These functions need a folder with the entomological surveillance files (from Re
 - WN_PlotDynamics
 
 - CheckMCMC
+
+#### modello a due specie 
+- WN_MCMC_and_Simu_2spec
+
+- WNV_ParPlotFunc_2spec
+
+- WN_PlotModelFit_2spec
+
+- WN_PlotDynamics_2spec
+
+-check_birth_pulse (NB va bene sia per il modello a due specie che per quello a una)
