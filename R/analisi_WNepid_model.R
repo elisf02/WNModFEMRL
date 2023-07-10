@@ -7,6 +7,7 @@
 WN_MCMC_and_Simu <- function(seed=0,
                              max_iter_MCMC=10000,
                              numero_simulazioni = 100,
+                             n_iter_preliminary_lik = 1000,
 
                              numero_cluster=1,
                              anno_inizio=2016,
@@ -35,8 +36,9 @@ WN_MCMC_and_Simu <- function(seed=0,
                              file_zanzare = "per_mcmc/zanzare/adulti_medi_",
                              vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
-                             sigma_big=3, #2
-                             sigma_small=0.01, #0.0001
+                             sigma_big=3, #2 sigma per B0
+                             sigma_small=0.01, #0.0001 sigma per tutti i parametri
+                             sigma_medio = 1, # sigma per s
 
                              LocOutMCMC = "Output_WNV/MCMC",
                              LocOutSimu = "Output_WNV/Simulazioni",
@@ -79,7 +81,8 @@ WN_MCMC_and_Simu <- function(seed=0,
                         max_iter_MCMC,sigma_small,sigma_big,con_cosa_inizio,file_zanzare,
                         beta,quale_cluster,numero_cluster,prior_pR,prior_B0,
                         min_muB,max_muB,
-                        min_s,max_s,min_phi,max_phi,min_niB,max_niB,min_recB,max_recB)
+                        min_s,max_s,min_phi,max_phi,min_niB,max_niB,min_recB,max_recB,
+                        n_iter_preliminary_lik, sigma_medio)
       system(to_terminal)
 
       output_mcmc=read.table(nome_file_parametri)

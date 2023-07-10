@@ -7,6 +7,7 @@
 WN_MCMC_and_Simu_2spec <- function(seed=0,
                                    max_iter_MCMC=10000,
                                    numero_simulazioni = 100,
+                                   n_iter_preliminary_lik = 1000,
 
                                    numero_cluster=1,
                                    anno_inizio=2016,
@@ -46,8 +47,9 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
                                    file_zanzare = "per_mcmc/zanzare/adulti_medi_",
                                    vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
-                                   sigma_big=0.0001,
-                                   sigma_small=0.0000000005,
+                                   sigma_big=10,
+                                   sigma_small=0.0001,
+                                   sigma_medio=1,
 
                                    LocOutMCMC = "Output_WNV/MCMC",
                                    LocOutSimu = "Output_WNV/Simulazioni",
@@ -542,65 +544,56 @@ CheckMCMC_2spec = function(InLoc = "Output_WNV/MCMC/",
     plot(output_mcmc[,j],type="l",main=nomi_parametri_plot[j])
 }
 
-check_birth_pulse = function(parms, #parms=c('muB' = 0.07,'s' = 5.7,'phi' = 0.55) or matric con colonne = parms names
-                             tmin = 90,
-                             tmax = 210,
-                             # NB, come parms puoi dare l'output dell'MCMC (nome del file)
-                             quante_specie = 2 # o 1
-) {
-
-  if(is.numeric(parms)){
-    with(as.list(parms), plot(muB*exp(-s*sin(pi*(seq(0,365)/365-phi[1]))^2)/besselI(s/2,0),
-                              type = 'l', lwd = 3, col = 'black'), xlab = 'time', ylab = 'BIRTH_PULSE')
-    abline(v = c(tmin, tmax), lwd = 2, col = 'yellow')
+check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
+{
+  if (is.numeric(parms)) {
+    with(as.list(parms), plot(muB * exp(-s * sin(pi * (seq(0,
+                                                           365)/365 - phi[1]))^2)/besselI(s/2, 0), type = "l",
+                              lwd = 3, col = "black"), xlab = "time", ylab = "BIRTH_PULSE")
+    abline(v = c(tmin, tmax), lwd = 2, col = "yellow")
   }
-  if(is.character(parms)){
-    if(quante_specie == 1)
-      nomi_parametri=c("p","B0","pR",
-                       "b1",
-                       "muB",
-                       "s", "phi", "niB", "recB")
-    if(quante_specie ==2)
-      nomi_parametri=c("p","p1","B0","B01","pR","pR1",
-                       "b1",# "b2",
-                       "muB",
-                       "s", "phi", "niB", "recB")
-    parametri_stimati=vector("list", length(nomi_parametri))
+  if (is.character(parms)) {
+    if (quante_specie == 1)
+      nomi_parametri = c("p", "B0", "pR", "b1", "muB",
+                         "s", "phi", "niB", "recB")
+    if (quante_specie == 2)
+      nomi_parametri = c("p", "p1", "B0", "B01", "pR",
+                         "pR1", "b1", "muB", "s", "phi", "niB", "recB")
+    parametri_stimati = vector("list", length(nomi_parametri))
     matrix_birth_pulse = c()
-    output_mcmc=read.table(parms)
-    if(ncol(output_mcmc)<=1)
-      output_mcmc=matrix(0,ncol=length(nomi_parametri)+1,nrow=max_iter_MCMC)
-    burnin=nrow(output_mcmc)*0.1
-    for(j in 1:(ncol(output_mcmc)-1))
-      parametri_stimati[[j]]=cbind(parametri_stimati[[j]],output_mcmc[-c(1:burnin),j])
-    for(j in which(nomi_parametri %in% c('muB', 'phi', 's')))
-      matrix_birth_pulse=cbind(matrix_birth_pulse,
-                               parametri_stimati[[j]])
-    colnames(matrix_birth_pulse) = c('muB', 's', 'phi')
-    birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a){
-      a['muB']*exp(-a['s']*sin(pi*(seq(0,365)/365-a['phi']))^2)/besselI(a['s']/2,0)
+    output_mcmc = read.table(parms)
+    if (ncol(output_mcmc) <= 1)
+      output_mcmc = matrix(0, ncol = length(nomi_parametri) +
+                             1, nrow = max_iter_MCMC)
+    burnin = nrow(output_mcmc) * 0.1
+    for (j in 1:(ncol(output_mcmc) - 1)) parametri_stimati[[j]] = cbind(parametri_stimati[[j]],
+                                                                        output_mcmc[-c(1:burnin), j])
+    for (j in which(nomi_parametri %in% c("muB", "phi", "s"))) matrix_birth_pulse = cbind(matrix_birth_pulse,
+                                                                                          parametri_stimati[[j]])
+    colnames(matrix_birth_pulse) = c("muB", "s", "phi")
+    birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
+      a["muB"] * exp(-a["s"] * sin(pi * (seq(0, 365)/365 -
+                                           a["phi"]))^2)/besselI(a["s"]/2, 0)
     })
-    matrix_birth_pulse[100,]
-    plot(birth_pulse[,100], type = 'l')
-
+    #matrix_birth_pulse[100, ]
+    #plot(birth_pulse[, 100], type = "l")
     mean = apply(birth_pulse, MARGIN = 1, function(a) {
-      mean(a,na.rm=T)
+      mean(a, na.rm = T)
     })
     qmin = apply(birth_pulse, MARGIN = 1, function(a) {
-      quantile(a,probs=0.025,na.rm=T)
+      quantile(a, probs = 0.025, na.rm = T)
     })
     qmax = apply(birth_pulse, MARGIN = 1, function(a) {
-      quantile(a,probs=0.975,na.rm=T)
+      quantile(a, probs = 0.975, na.rm = T)
     })
-
-    ymax=max(qmax, qmin, mean)
-    plot(0,col="white",xlim=c(0,366),ylim=c(0,ymax),xlab="time",ylab="birth_pulse",
-         axes=T,main=quale_cluster)
-    abline(v = c(tmin, tmax), lwd = 2, col = 'yellow')
-    lines(mean,lwd=3,col='black')
-    poligono=cbind(x=c(1:length(mean),length(mean):1),
-                   y=c(qmin,rev(qmax)))
-    polygon(poligono,col=adjustcolor('grey',alpha=0.2),border=NA)
-
+    ymax = max(qmax, qmin, mean)
+    plot(0, col = "white", xlim = c(0, 366), ylim = c(0,
+                                                      ymax), xlab = "time", ylab = "birth_pulse", axes = T)
+    abline(v = c(tmin, tmax), lwd = 2, col = "yellow")
+    lines(mean, lwd = 3, col = "black")
+    poligono = cbind(x = c(1:length(mean), length(mean):1),
+                     y = c(qmin, rev(qmax)))
+    polygon(poligono, col = adjustcolor("grey", alpha = 0.2),
+            border = NA)
   }
 }
