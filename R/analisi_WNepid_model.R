@@ -29,11 +29,11 @@ WN_MCMC_and_Simu <- function(seed=0,
                              min_phi=0,
                              max_phi=1,
 
-                             file_temperatura = "per_mcmc/temperatura_media_",
-                             file_numero_pool = "per_mcmc/totale_pool_cluster_",
-                             file_numero_pool_positivi = "per_mcmc/totale_pool_WNVpos_cluster_",
-                             file_pool_size = "per_mcmc/mean_pool_size_cluster_",
-                             file_zanzare = "per_mcmc/zanzare/adulti_medi_",
+                             file_temperatura_name = "per_mcmc/temperatura_media_",
+                             file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
+                             file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
+                             file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
+                             file_zanzare_name = "per_mcmc/zanzare/adulti_medi_",
                              vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
                              sigma_big=3, #2 sigma per B0
@@ -58,11 +58,11 @@ WN_MCMC_and_Simu <- function(seed=0,
   for(quale_cluster in 1:numero_cluster){
     for(anno in anno_inizio:anno_fine){
 
-      file_temperatura= paste0(file_temperatura,anno)
-      file_numero_pool= paste0(file_numero_pool,anno)
-      file_numero_pool_positivi= paste0(file_numero_pool_positivi,anno)
-      file_pool_size= paste0(file_pool_size,anno)
-      file_zanzare= paste0(file_zanzare,anno)
+      file_temperatura= paste0(file_temperatura_name,anno)
+      file_numero_pool= paste0(file_numero_pool_name,anno)
+      file_numero_pool_positivi= paste0(file_numero_pool_positivi_name,anno)
+      file_pool_size= paste0(file_pool_size_name,anno)
+      file_zanzare= paste0(file_zanzare_name,anno)
 
 
       if(con_cosa_inizio==0)
@@ -222,8 +222,8 @@ WN_PlotModelFit = function(anno_inizio = 2016,
                            FolderPlotOut = "Output_WNV/Simulazioni/Plots/",
                            PlotName = "ModelFit_",
 
-                           file_numero_pool = "per_mcmc/totale_pool_cluster_",
-                           file_numero_pool_positivi = "per_mcmc/totale_pool_WNVpos_cluster_",
+                           file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
+                           file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
                            file_pool_size = "per_mcmc/mean_pool_size_cluster_",
                            vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
@@ -247,8 +247,8 @@ WN_PlotModelFit = function(anno_inizio = 2016,
 
     message(paste('plot ModelFit',anno))
 
-    file_numero_pool=paste0(file_numero_pool, anno)
-    file_numero_pool_positivi=paste0(file_numero_pool_positivi ,anno)
+    file_numero_pool=paste0(file_numero_pool_name, anno)
+    file_numero_pool_positivi=paste0(file_numero_pool_positivi_name ,anno)
     file_pool_size=paste0(file_pool_size ,anno)
 
     numero_pool=read.table(file_numero_pool)

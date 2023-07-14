@@ -40,11 +40,11 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
                                    niB1 = 1/2,
                                    recB1 = 1/5,
 
-                                   file_temperatura = "per_mcmc/temperatura_media_",
-                                   file_numero_pool = "per_mcmc/totale_pool_cluster_",
-                                   file_numero_pool_positivi = "per_mcmc/totale_pool_WNVpos_cluster_",
-                                   file_pool_size = "per_mcmc/mean_pool_size_cluster_",
-                                   file_zanzare = "per_mcmc/zanzare/adulti_medi_",
+                                   file_temperatura_name = "per_mcmc/temperatura_media_",
+                                   file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
+                                   file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
+                                   file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
+                                   file_zanzare_name = "per_mcmc/zanzare/adulti_medi_",
                                    vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
                                    sigma_big=10,
@@ -70,11 +70,11 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
   for(quale_cluster in 1:numero_cluster){
     for(anno in anno_inizio:anno_fine){
 
-      file_temperatura= paste0(file_temperatura,anno)
-      file_numero_pool= paste0(file_numero_pool,anno)
-      file_numero_pool_positivi= paste0(file_numero_pool_positivi,anno)
-      file_pool_size= paste0(file_pool_size,anno)
-      file_zanzare= paste0(file_zanzare,anno)
+      file_temperatura= paste0(file_temperatura_name,anno)
+      file_numero_pool= paste0(file_numero_pool_name,anno)
+      file_numero_pool_positivi= paste0(file_numero_pool_positivi_name,anno)
+      file_pool_size= paste0(file_pool_size_name,anno)
+      file_zanzare= paste0(file_zanzare_name,anno)
 
 
       if(con_cosa_inizio==0)
@@ -231,8 +231,8 @@ WN_PlotModelFit_2spec = function(anno_inizio = 2016,
                                  FolderPlotOut = "Output_WNV/Simulazioni/Plots/",
                                  PlotName = "ModelFit_2spec",
 
-                                 file_numero_pool = "per_mcmc/totale_pool_cluster_",
-                                 file_numero_pool_positivi = "per_mcmc/totale_pool_WNVpos_cluster_",
+                                 file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
+                                 file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
                                  file_pool_size = "per_mcmc/mean_pool_size_cluster_",
                                  vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
@@ -256,8 +256,8 @@ WN_PlotModelFit_2spec = function(anno_inizio = 2016,
 
     message(paste('plot ModelFit',anno))
 
-    file_numero_pool=paste0(file_numero_pool, anno)
-    file_numero_pool_positivi=paste0(file_numero_pool_positivi ,anno)
+    file_numero_pool=paste0(file_numero_pool_name, anno)
+    file_numero_pool_positivi=paste0(file_numero_pool_positivi_name ,anno)
     file_pool_size=paste0(file_pool_size ,anno)
 
     numero_pool=read.table(file_numero_pool)
@@ -548,7 +548,7 @@ check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
 {
   if (is.numeric(parms)) {
     with(as.list(parms), plot(muB * exp(-s * sin(pi * (seq(0,
-                                                           365)/365 - phi[1]))^2)/besselI(s/2, 0), type = "l",
+                                                           365)/365 - phi[1]))^2)/besselI(s/2, 0,T), type = "l",
                               lwd = 3, col = "black"), xlab = "time", ylab = "BIRTH_PULSE")
     abline(v = c(tmin, tmax), lwd = 2, col = "yellow")
   }
@@ -573,7 +573,7 @@ check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
     colnames(matrix_birth_pulse) = c("muB", "s", "phi")
     birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
       a["muB"] * exp(-a["s"] * sin(pi * (seq(0, 365)/365 -
-                                           a["phi"]))^2)/besselI(a["s"]/2, 0)
+                                           a["phi"]))^2)/besselI(a["s"]/2, 0,T)
     })
     #matrix_birth_pulse[100, ]
     #plot(birth_pulse[, 100], type = "l")
