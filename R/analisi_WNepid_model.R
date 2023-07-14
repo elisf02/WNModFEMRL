@@ -224,7 +224,7 @@ WN_PlotModelFit = function(anno_inizio = 2016,
 
                            file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
                            file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
-                           file_pool_size = "per_mcmc/mean_pool_size_cluster_",
+                           file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
                            vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
                            cex_main = 2,
@@ -249,7 +249,7 @@ WN_PlotModelFit = function(anno_inizio = 2016,
 
     file_numero_pool=paste0(file_numero_pool_name, anno)
     file_numero_pool_positivi=paste0(file_numero_pool_positivi_name ,anno)
-    file_pool_size=paste0(file_pool_size ,anno)
+    file_pool_size=paste0(file_pool_size_name ,anno)
 
     numero_pool=read.table(file_numero_pool)
     numero_pool_positivi=read.table(file_numero_pool_positivi)
