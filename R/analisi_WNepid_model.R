@@ -29,7 +29,7 @@ WN_MCMC_and_Simu <- function(seed=0,
                              min_phi=0,
                              max_phi=1,
 
-                             file_temperatura_name = "per_mcmc/temperatura_media_",
+                             file_temperatura_name= "per_mcmc/temperatura_media_",
                              file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
                              file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
                              file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
