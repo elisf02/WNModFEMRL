@@ -522,10 +522,10 @@ Simu4Sens <- function(seed=0,
                       NameOutDyn = "dynamics_sens_"
 
 ){
+  numero_catture=length(scan(vettore_date_catture,quiet=T))
   nomi_parametri=c("p","B0","pR","b1",# "b2",
                    "muB",
                    "s", "phi", "niB", "recB")
-  numero_catture=length(scan(vettore_date_catture,quiet=T))
 
   cluster_simulati=numero_cluster
 
@@ -548,13 +548,10 @@ Simu4Sens <- function(seed=0,
 
       beta=4.61
       output_mcmc=read.table(nome_file_parametri)
-      if(ncol(output_mcmc)<=1)
-        output_mcmc=matrix(0,ncol=length(nomi_parametri)+1,nrow=max_iter_MCMC)
-
       parametri_per_simulazione=paste0(LocOutMCMC,
                                        "/per_simulazione_sens_",anno,"_",quale_cluster,".txt")
 
-      write.table(output_mcmc[1,],row.names=F,col.names=F,
+      write.table(output_mcmc,row.names=F,col.names=F,
                   file=parametri_per_simulazione)
 
       nome_file_output_dynamics=paste0(LocOutSimu,
@@ -572,7 +569,10 @@ Simu4Sens <- function(seed=0,
                         con_cosa_inizio,file_zanzare,beta,quale_cluster, numero_cluster)
 
       system(to_terminal)
+      # "time",
+      # ./uccelli1Clus_WNV_simulationSens
+
+
     }
   }
 }
-
