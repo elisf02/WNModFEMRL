@@ -54,9 +54,9 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
                                    LocOutMCMC = "Output_WNV/MCMC",
                                    LocOutSimu = "Output_WNV/Simulazioni",
 
-                                   NameOutParms = "parametri_2spec",
-                                   NameOutParmsPerSimu = "per_simulazione_2spec",
-                                   NameOutDyn = "dynamics_2spec"
+                                   NameOutParms = "parametri_2spec_",
+                                   NameOutParmsPerSimu = "per_simulazione_2spec_",
+                                   NameOutDyn = "dynamics_2spec_"
 
 ){
   nomi_parametri=c("p","p1","B0","B01","pR","pR1",
@@ -95,7 +95,8 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
                         min_muB,max_muB,
                         min_s,max_s,min_phi,max_phi,min_niB,max_niB,min_recB,max_recB,
                         prior_pR1,prior_B01,
-                        b11, muB1, s1, phi1, niB1, recB1)
+                        b11, muB1, s1, phi1, niB1, recB1,
+                        n_iter_preliminary_lik, sigma_medio)
       system(to_terminal)
 
       output_mcmc=read.table(nome_file_parametri)
@@ -141,8 +142,6 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
     }
   }
 }
-
-
 
 
 WNV_ParPlotFunc_2spec <- function(anno_inizio,
