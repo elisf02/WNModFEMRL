@@ -82,6 +82,8 @@ WN_MCMC_and_Simu <- function(seed=0,
                         beta,quale_cluster,numero_cluster,prior_pR,prior_B0,
                         min_muB,max_muB,
                         min_s,max_s,min_phi,max_phi,min_niB,max_niB,min_recB,max_recB,
+                        prior_pR1,prior_B01,
+                        b11, muB1, s1, phi1, niB1, recB1,
                         n_iter_preliminary_lik, sigma_medio)
       system(to_terminal)
 
