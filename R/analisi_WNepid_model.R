@@ -512,84 +512,65 @@ CheckMCMC = function(InLoc = "Output_WNV/MCMC/",
     plot(output_mcmc[,j],type="l",main=nomi_parametri_plot[j])
 }
 
-Simu4Sens <- function(seed=0,
-                      numero_cluster=1,
-                      anno_inizio=2016,
-                      anno_fine=2016,
+Simu4Sens <- function (seed = 0,
+                       numero_cluster = 1,
+                       anno_inizio = 2016,
+                       anno_fine = 2018,
+                       to_mean_all_years = T,
+                       con_cosa_inizio = 1,
+                       file_temperatura_name = "per_mcmc/temperatura_media_",
+                       file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
+                       file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
+                       file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
+                       file_zanzare_name = "per_mcmc/zanzare/adulti_medi_",
+                       vettore_date_catture = "per_mcmc/giorni_cattura.txt",
+                       LocOutSimu = "Output_WNV/Simulazioni",
+                       LocOutMCMC = "Output_WNV/MCMC",
+                       NameInParms = "parametri_sens",
+                       NameOutDyn = "dynamics_sens_")
+{
+  numero_catture = length(scan(vettore_date_catture, quiet = T))
+  nomi_parametri = c("p", "B0", "pR", "b1", "muB", "s", "phi",
+                     "niB", "recB")
+  cluster_simulati = numero_cluster
+  for (quale_cluster in 1:numero_cluster) {
+    for (anno in anno_inizio:anno_fine) {
+      file_temperatura = paste0(file_temperatura_name,
+                                anno)
+      file_numero_pool = paste0(file_numero_pool_name,
+                                anno)
+      file_numero_pool_positivi = paste0(file_numero_pool_positivi_name,
+                                         anno)
+      file_pool_size = paste0(file_pool_size_name, anno)
+      file_zanzare = paste0(file_zanzare_name, anno)
 
-                      con_cosa_inizio = 1,
+      if(to_mean_all_years)
+        nome_file_parametri = paste0(LocOutMCMC, "/",
+                                     NameInParms,
+                                     ".txt")
+      if(!to_mean_all_years)
+        nome_file_parametri = paste0(LocOutMCMC, "/",
+                                     NameInParms, '_', anno, ".txt")
 
-                      file_temperatura_name= "per_mcmc/temperatura_media_",
-                      file_numero_pool_name = "per_mcmc/totale_pool_cluster_",
-                      file_numero_pool_positivi_name = "per_mcmc/totale_pool_WNVpos_cluster_",
-                      file_pool_size_name = "per_mcmc/mean_pool_size_cluster_",
-                      file_zanzare_name = "per_mcmc/zanzare/adulti_medi_",
-                      vettore_date_catture="per_mcmc/giorni_cattura.txt",
-
-                      LocOutSimu = "Output_WNV/Simulazioni",
-                      LocOutMCMC = "Output_WNV/MCMC",
-
-                      NameInParms = "parametri_sens_", # parametri che vuoi usare (da MCMC stessi nomi)
-                      NameOutDyn = "dynamics_sens_"
-
-){
-  numero_catture=length(scan(vettore_date_catture,quiet=T))
-  nomi_parametri= c('p', # starting_fraction
-                    'B0', # uccelli_iniziali
-                    'pR', # startin_immune_fraction (pR?)
-                    'b1',
-                    'muB',
-                    's',
-                    'phi',
-                    'niB',
-                    'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
-
-  cluster_simulati=numero_cluster
-
-  for(quale_cluster in 1:numero_cluster){
-    for(anno in anno_inizio:anno_fine){
-
-      file_temperatura= paste0(file_temperatura_name,anno)
-      file_numero_pool= paste0(file_numero_pool_name,anno)
-      file_numero_pool_positivi= paste0(file_numero_pool_positivi_name,anno)
-      file_pool_size= paste0(file_pool_size_name,anno)
-      file_zanzare= paste0(file_zanzare_name,anno)
-
-
-      if(con_cosa_inizio==0)
-        nome_file_parametri=paste0(LocOutMCMC, "/", NameInParms,
-                                   "B_",anno,"_",quale_cluster,".txt")
-      if(con_cosa_inizio==1)
-        nome_file_parametri=paste0(LocOutMCMC, "/", NameInParms,
-                                   "M_",anno,"_",quale_cluster,".txt")
-
-      beta=4.61
-      output_mcmc=read.table(nome_file_parametri)
-      parametri_per_simulazione=paste0(LocOutMCMC,
-                                       "/per_simulazione_sens_",anno,"_",quale_cluster,".txt")
-
-      write.table(output_mcmc,row.names=F,col.names=F,
-                  file=parametri_per_simulazione)
-
-      nome_file_output_dynamics=paste0(LocOutSimu,
-                                       "/", NameOutDyn,
-                                       anno,"_",quale_cluster,".txt")
-
-      ncol_file_parametri=ncol(read.table(nome_file_parametri))
-      numero_simulazioni = nrow_file_parametri=nrow(read.table(nome_file_parametri))
-
-      to_terminal=paste("time",
-                        paste0(system.file(package = "WNModFEMRL"),'/templates/uccelli1Clus_WNV_simulationSens'),
-                        seed,file_temperatura,file_numero_pool,file_numero_pool_positivi,
-                        file_pool_size,numero_catture,vettore_date_catture,nome_file_output_dynamics,
-                        numero_simulazioni,parametri_per_simulazione,ncol_file_parametri,nrow_file_parametri,
-                        con_cosa_inizio,file_zanzare,beta,quale_cluster, numero_cluster)
-
+      beta = 4.61
+      output_mcmc = read.table(nome_file_parametri)
+      parametri_per_simulazione = paste0(LocOutMCMC, "/per_simulazione_sens_",
+                                         anno, "_", quale_cluster, ".txt")
+      write.table(output_mcmc, row.names = F, col.names = F,
+                  file = parametri_per_simulazione)
+      nome_file_output_dynamics = paste0(LocOutSimu, "/",
+                                         NameOutDyn, anno, "_", quale_cluster, ".txt")
+      ncol_file_parametri = ncol(read.table(nome_file_parametri))
+      numero_simulazioni = nrow_file_parametri = nrow(read.table(nome_file_parametri))
+      to_terminal = paste("time", paste0(system.file(package = "WNModFEMRL"),
+                                         "/templates/uccelli1Clus_WNV_simulationSens"),
+                          seed, file_temperatura, file_numero_pool, file_numero_pool_positivi,
+                          file_pool_size, numero_catture, vettore_date_catture,
+                          nome_file_output_dynamics, numero_simulazioni,
+                          parametri_per_simulazione, ncol_file_parametri,
+                          nrow_file_parametri, con_cosa_inizio, file_zanzare,
+                          beta, quale_cluster, numero_cluster)
       system(to_terminal)
-      # "time",
-      # ./uccelli1Clus_WNV_simulationSens
-
-
     }
   }
 }

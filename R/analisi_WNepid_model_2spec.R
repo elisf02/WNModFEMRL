@@ -457,12 +457,12 @@ WN_PlotDynamics_2spec <- function(anno_inizio,
       all_bird_seroprevalence = ((BR+BR2)/(BS+BE+BI+BR+BS2+BE2+BI2+BR2))*100
 
       known_bird_population = BS+BE+BI+BR
-      prev_known_bird_population = (BI/bird_population_nota)*100
-      seroprev_known_bird_population = (BR/bird_population_nota)*100
+      prev_known_bird_population = (BI/known_bird_population)*100
+      seroprev_known_bird_population = (BR/known_bird_population)*100
 
       avian_community = BS2+BE2+BI2+BR2
-      prevalence_avian_community = (BI2/bird_population_MCMC)*100
-      seroprevalence_avian_community = (BR2/bird_population_MCMC)*100
+      prevalence_avian_community = (BI2/avian_community)*100
+      seroprevalence_avian_community = (BR2/avian_community)*100
 
       ################
       if(what_plot == 'mosquito_prevalence') {
@@ -612,7 +612,7 @@ check_birth_pulse = function(parms,
                              tmin = 90,
                              tmax = 210,
                              quante_specie = 2)
-  {
+{
   if (is.numeric(parms)) {
     with(as.list(parms), plot(muB * exp(-s * sin(pi * (seq(0,
                                                            365)/365 - phi[1]))^2)/besselI(s/2, 0,T), type = "l",
@@ -644,35 +644,29 @@ check_birth_pulse = function(parms,
                         'phi_ca',
                         'niB_ca',
                         'recB_ca') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
+
     parametri_stimati = vector("list", length(nomi_parametri))
-    matrix_birth_pulse = c()
     output_mcmc = read.table(parms)
-    if (ncol(output_mcmc) <= 1)
-      output_mcmc = matrix(0, ncol = length(nomi_parametri) +
-                             1, nrow = max_iter_MCMC)
+    colnames(output_mcmc) = c(nomi_parametri, 'lik')
+
     burnin = nrow(output_mcmc) * 0.1
-    for (j in 1:(ncol(output_mcmc) - 1)) parametri_stimati[[j]] = cbind(parametri_stimati[[j]],
-                                                                        output_mcmc[-c(1:burnin), j])
+    output_mcmc = output_mcmc[-c(1:burnin),]
+
     if(quante_specie == 1) {
-      for (j in which(nomi_parametri %in% c("muB", "phi", "s")))
-        matrix_birth_pulse = cbind(matrix_birth_pulse,
-                                   parametri_stimati[[j]])
-      colnames(matrix_birth_pulse) = c("muB", "s", "phi")
-      birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
-        a["muB"] * exp(-a["s"] * sin(pi * (seq(0, 365)/365 -
-                                             a["phi"]))^2)/besselI(a["s"]/2, 0,T)
-      })
+      birth_pulse = apply(output_mcmc,
+                          MARGIN = 1, function(a) {
+                            with(as.list(a),
+                                 muB*exp(-s*sin(pi*(seq(0, 365)/365-phi))^2)/besselI(s/2, 0,T))
+                          })
     }
     if(quante_specie == 2) {
-      for (j in which(nomi_parametri %in% c("muB_ca", "phi_ca", "s_ca")))
-        matrix_birth_pulse = cbind(matrix_birth_pulse,
-                                   parametri_stimati[[j]])
-      colnames(matrix_birth_pulse) = c("muB_ca", "s_ca", "phi_ca")
-      birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
-        a["muB_ca"] * exp(-a["s_ca"] * sin(pi * (seq(0, 365)/365 -
-                                             a["phi_ca"]))^2)/besselI(a["s"]/2, 0,T)
-      })
+      birth_pulse = apply(output_mcmc,
+                          MARGIN = 1, function(a) {
+                            with(as.list(a),
+                                 muB_ca*exp(-s_ca*sin(pi*(seq(0, 365)/365-phi_ca))^2)/besselI(s_ca/2, 0,T))
+                          })
     }
+
     mean = apply(birth_pulse, MARGIN = 1, function(a) {
       mean(a, na.rm = T)
     })
