@@ -59,10 +59,19 @@ WN_MCMC_and_Simu_2spec <- function(seed=0,
                                    NameOutDyn = "dynamics_2spec_"
 
 ){
-  nomi_parametri=c("p","p1","B0","B01","pR","pR1",
-                   "b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p_ca', # starting_fraction comunità aviaria
+                    'p_sn', # starting_fraction specie nota
+                    'B0_ca', # uccelli_iniziali comunità aviaria
+                    'B0_sn', # uccelli_iniziali specie nota
+                    'pR_ca', # startin_immune_fraction comunità aviaria
+                    'pR_sn', # startin_immune_fraction specie nota
+
+                    'b1_ca',
+                    'muB_ca',
+                    's_ca',
+                    'phi_ca',
+                    'niB_ca',
+                    'recB_ca') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
   numero_catture=length(scan(vettore_date_catture,quiet=T))
 
   cluster_simulati=numero_cluster
@@ -153,10 +162,19 @@ WNV_ParPlotFunc_2spec <- function(anno_inizio,
                                   FileAllParmsName="parametri_2spec",
                                   FileParmsPerSimuName="per_simulazione_2spec"
 ) {
-  nomi_parametri=c("p","p1","B0","B01","pR","pR1",
-                   "b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p_ca', # starting_fraction comunità aviaria
+                    'p_sn', # starting_fraction specie nota
+                    'B0_ca', # uccelli_iniziali comunità aviaria
+                    'B0_sn', # uccelli_iniziali specie nota
+                    'pR_ca', # startin_immune_fraction comunità aviaria
+                    'pR_sn', # startin_immune_fraction specie nota
+
+                    'b1_ca',
+                    'muB_ca',
+                    's_ca',
+                    'phi_ca',
+                    'niB_ca',
+                    'recB_ca') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
 
   for(anno in anno_inizio:anno_fine){
 
@@ -324,7 +342,7 @@ WN_PlotModelFit_2spec = function(anno_inizio = 2016,
       # ymax=max(pool_positivi_simulati,as.numeric(catture[5, quando_ho_pool]))
       ymax=ymax_plot
       xmax=ncol(pool_positivi_simulati)
-      plot(0,col="white",xlim=c(0,xmax),ylim=c(0,ymax),xlab="",ylab="",axes=F,main=quale_cluster)
+      plot(0,col="white",xlim=c(0,xmax),ylim=c(0,ymax),xlab="",ylab="",axes=F,main=paste('Model Fit',anno, quale_cluster))
       for(i in 1:(ncol(pool_positivi_simulati)))
         plotbox(w=i,X=pool_positivi_simulati[,i],fun=median,wd=0.2,col=colori[quale_cluster])
       points(1:xmax, numero_pool_positivi[quale_cluster, quando_ho_pool][1:xmax],
@@ -336,8 +354,7 @@ WN_PlotModelFit_2spec = function(anno_inizio = 2016,
       # quando_inizio_mesi=c(quando_inizio_mesi,xmax)
       axis(1,at=c(1:xmax),labels=date,las=2)
       axis(2,las=2,at=seq(0,ymax,5))
-      mtext("WNV positive pools",side=2,line=5,adj=0.5,cex=1.7)
-
+      mtext("WNV positive pools",side=2,line=2.5,adj=0.5,cex=1.7)
 
       quante_osservazioni=quante_osservazioni+length(quando_ho_pool)
       for(i in 1:(ncol(pool_positivi_simulati))){
@@ -354,28 +371,38 @@ WN_PlotModelFit_2spec = function(anno_inizio = 2016,
   return(list('quanti_dentro'=round(quanti_dentro95/quante_osservazioni,2)))
 }
 
+
 WN_PlotDynamics_2spec <- function(anno_inizio,
-                            anno_fine,
-                            numero_cluster,
+                                  anno_fine,
+                                  numero_cluster,
 
-                            con_cosa_inizio = 1,
+                                  con_cosa_inizio = 1,
 
-                            FolderSimu="Output_WNV/Simulazioni/",
-                            FileDynName = "dynamics_2spec",
-                            FolderPlotOut = "Output_WNV/Simulazioni/Plots/",
-                            PlotName = "Dynamics_MosqPrev_2spec_",
+                                  FolderSimu="Output_WNV/Simulazioni/",
+                                  FileDynName = "dynamics_2spec",
+                                  FolderPlotOut = "Output_WNV/Simulazioni/Plots/",
+                                  PlotName = "Dynamics_MosqPrev_2spec_",
 
-                            vettore_date_catture="per_mcmc/giorni_cattura.txt",
+                                  vettore_date_catture="per_mcmc/giorni_cattura.txt",
 
-                            cex_main = 2,
-                            cex_axes = 1.2,
-                            cex_lab_axes = 1.2,
-                            margins_plot = c(7,7,4,2),
-                            colore = 'darkgreen',
-                            what_plot = 'mosquito_prevalence'
-                            # or:'moquito population' 'all_bird_prevalence', 'all_bird_population'
-                            # or:'bird_prevalence_MCMC', 'bird_population_MCMC'
-                            # or:'bird_prevalence_nota', 'bird_population_nota'
+                                  cex_main = 2,
+                                  cex_axes = 1.2,
+                                  cex_lab_axes = 1.2,
+                                  margins_plot = c(5,6.5,4,2),
+                                  what_plot = 'mosquito_prevalence',
+                                  to_plot_on_file = F
+                                  # 'mosquito_prevalence'
+                                  # 'mosquito_population'
+                                  # 'infectious_mosquitoes'
+                                  # 'all_bird_prevalence'
+                                  # 'all_bird_population'
+                                  # 'all_bird_seroprevalence'
+                                  # 'avian_community'
+                                  # 'prevalence_avian_community'
+                                  # 'seroprevalence_avian_community'
+                                  # 'known_bird_population'
+                                  # 'prev_known_bird_population'
+                                  # 'seroprev_known_bird_population'
 ) {
   settimane=scan(vettore_date_catture)
 
@@ -383,9 +410,10 @@ WN_PlotDynamics_2spec <- function(anno_inizio,
     print(anno)
 
     nome_file_plot=paste0(FolderPlotOut, PlotName , what_plot, anno,".jpg")
-    jpeg(nome_file_plot,height=1*1000,width=1*1400,res=200)
+    if(to_plot_on_file)
+      jpeg(nome_file_plot,height=1*1000,width=1*1400,res=200)
 
-    par(mfrow=c(1,1),mar=margins_plot,cex.main=cex_main,cex.axis=cex_axes)
+    par(mfrow=c(1,1), mar=margins_plot,cex.main=cex_main,cex.axis=cex_axes)
 
     numero_classi = 11
     for(quale_cluster in 1:numero_cluster){
@@ -422,45 +450,88 @@ WN_PlotDynamics_2spec <- function(anno_inizio,
       BR2=output_dynamics[sel_BR2,]
 
       mosquito_population = MS+ME+MI
-      mosquito_prevalence=MI/mosquito_population
+      mosquito_prevalence=(MI/mosquito_population)*100
 
       all_bird_population = BS+BE+BI+BR+BS2+BE2+BI2+BR2
-      all_bird_prevalence = (BI+BI2)/(BS+BE+BI+BR+BS2+BE2+BI2+BR2)
+      all_bird_prevalence = ((BI+BI2)/(BS+BE+BI+BR+BS2+BE2+BI2+BR2))*100
+      all_bird_seroprevalence = ((BR+BR2)/(BS+BE+BI+BR+BS2+BE2+BI2+BR2))*100
 
-      bird_population_nota = BS+BE+BI+BR
-      bird_prevalence_nota = BI/bird_population_nota
+      known_bird_population = BS+BE+BI+BR
+      prev_known_bird_population = (BI/bird_population_nota)*100
+      seroprev_known_bird_population = (BR/bird_population_nota)*100
 
-      bird_population_MCMC = BS2+BE2+BI2+BR2
-      bird_prevalence_MCMC = BI2/bird_population_MCMC
+      avian_community = BS2+BE2+BI2+BR2
+      prevalence_avian_community = (BI2/bird_population_MCMC)*100
+      seroprevalence_avian_community = (BR2/bird_population_MCMC)*100
 
-      if(what_plot == 'mosquito_prevalence')
+      ################
+      if(what_plot == 'mosquito_prevalence') {
         pop = mosquito_prevalence
-      if(what_plot == 'mosquito_population')
-        pop = mosquito_population
-      if(what_plot == 'all_bird_prevalence')
-        pop = all_bird_prevalence
-      if(what_plot == 'all_bird_population')
-        pop = all_bird_population
-      if(what_plot == 'bird_prevalence_nota')
-        pop = bird_prevalence_nota
-      if(what_plot == 'bird_population_nota')
-        pop = bird_population_nota
-      if(what_plot == 'bird_prevalence_MCMC')
-        pop = bird_prevalence_MCMC
-      if(what_plot == 'bird_population_MCMC')
-        pop = bird_population_MCMC
-
-      qmax_pop=c()
-      qmin_pop=c()
-      mean_pop=c()
-      for(j in 1:(ncol(pop))){
-        qmax_pop=c(qmax_pop,
-                   quantile(pop[,j],probs=0.975,na.rm=T))
-        qmin_pop=c(qmin_pop,
-                   quantile(pop[,j],probs=0.025,na.rm=T))
-        mean_pop=c(mean_pop,
-                   mean(pop[,j],na.rm=T))
+        ytext = 'prevalence (%)'
+        colore = 'violet'
       }
+      if(what_plot == 'mosquito_population'){
+        pop = mosquito_population
+        ytext = 'Number of moquitoes'
+        colore = 'purple'
+      }
+      if(what_plot == 'infectious_mosquitoes') {
+        pop = MI
+        ytext = 'Number of I-moquitoes'
+        colore ='violet'
+      }
+
+      if(what_plot == 'all_bird_prevalence') {
+        pop = all_bird_prevalence
+        ytext = 'prevalence (%)'
+        colore ='darkred'
+      }
+      if(what_plot == 'all_bird_population') {
+        pop = all_bird_population
+        ytext = 'Number of birds'
+        colore ='darkblue'
+      }
+      if(what_plot == 'all_bird_seroprevalence') {
+        pop = all_bird_seroprevalence
+        ytext = 'prevalence (%)'
+        colore ='darkgreen'
+      }
+
+      if(what_plot == 'avian_community') {
+        pop = avian_community
+        ytext = 'Number of birds'
+        colore ='blue'
+      }
+      if(what_plot == 'prevalence_avian_community') {
+        pop = prevalence_avian_community
+        ytext = 'prevalence (%)'
+        colore ='red'
+      }
+      if(what_plot == 'seroprevalence_avian_community') {
+        pop = seroprevalence_avian_community
+        ytext = 'prevalence (%)'
+        colore ='green'
+      }
+
+      if(what_plot == 'known_bird_population') {
+        pop = known_bird_population
+        ytext = 'Number of birds'
+        colore ='blue'
+      }
+      if(what_plot == 'prev_known_bird_population') {
+        pop = prev_known_bird_population
+        ytext = 'prevalence (%)'
+        colore ='red'
+      }
+      if(what_plot == 'seroprev_known_bird_population') {
+        pop = seroprev_known_bird_population
+        ytext = 'prevalence (%)'
+        colore ='green'
+      }
+
+      qmax_pop = apply(pop, MARGIN = 2, function(p){quantile(p, probs=0.975,na.rm=T)})
+      qmin_pop = apply(pop, MARGIN = 2, function(p){quantile(p, probs=0.025,na.rm=T)})
+      mean_pop = apply(pop, MARGIN = 2, mean)
 
       qmax_pop[which(is.na(qmax_pop))]=0
       qmin_pop[which(is.na(qmin_pop))]=0
@@ -468,33 +539,19 @@ WN_PlotDynamics_2spec <- function(anno_inizio,
 
       ymax=max(qmax_pop)
       xmax=length(qmax_pop)
-      plot(0,col="white",xlim=c(0,xmax),ylim=c(0,ymax),xlab="",ylab="",axes=F,main=quale_cluster)
+      plot(0,col="white",xlim=c(0,xmax),ylim=c(0,ymax),xlab="",ylab="",axes=F,
+           main=paste(what_plot, anno, quale_cluster))
       lines(mean_pop,lwd=3,col=colore)
       poligono=cbind(x=c(1:length(mean_pop),length(mean_pop):1),
                      y=c(qmin_pop,rev(qmax_pop)))
       polygon(poligono,col=adjustcolor(colore,alpha=0.2),border=NA)
       axis(1,at=c(1,1+31,1+31+30,1+31+30+31,1+31+30+31+31,1+31+30+31+31+30),
-           labels= c('Apr', 'May', 'Jun', 'Jul', 'Aug','Sept'),cex.axis=1.5,las=2)
+           labels= c('Apr', 'May', 'Jun', 'Jul', 'Aug','Sept'),cex.axis=cex_axes,las=2)
+      scientific_num = ifelse((ymax<1e-02 | ymax>1e+05), T, F)
       axis(2,at=seq(0,ymax,length.out=4),las=2,
-           labels=format(seq(0,ymax,length.out=4),digits=2,scientific=T),cex.axis=1.5)
-      if(what_plot == 'mosquito_prevalence')
-        text = 'Prev in mosquitoes'
-      if(what_plot == 'mosquito_population')
-        text = 'Mosquito pop'
-      if(what_plot == 'all_bird_prevalence')
-        text = 'Prev in birds'
-      if(what_plot == 'all_bird_population')
-        text = 'Bird pop'
-      if(what_plot == 'bird_prevalence_nota')
-        text = 'Prev in known species'
-      if(what_plot == 'bird_population_nota')
-        text = 'know species pop'
-      if(what_plot == 'bird_prevalence_MCMC')
-        text = 'Prev in other avian comm'
-      if(what_plot == 'bird_population_MCMC')
-        text = 'other avian pop'
-
-      mtext(text,side=2,line=6,adj=0.5)
+           labels=format(seq(0,ymax,length.out=4),digits=2,scientific=scientific_num),
+           cex.axis=cex_axes)
+      mtext(ytext, side = 2, line = 3.5, cex = cex_axes+0.3)
     }
     dev.off()
   }
@@ -509,11 +566,19 @@ CheckMCMC_2spec = function(InLoc = "Output_WNV/MCMC/",
                      OutLoc = "Output_WNV/MCMC/Plots/",
                      OutFileName = "Check_Lik_2spec",
                      con_cosa_inizio = 1){
-  nomi_parametri=c("p","p1","B0","B01","pR","pR1",
-                   "b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p_ca', # starting_fraction comunità aviaria
+                    'p_sn', # starting_fraction specie nota
+                    'B0_ca', # uccelli_iniziali comunità aviaria
+                    'B0_sn', # uccelli_iniziali specie nota
+                    'pR_ca', # startin_immune_fraction comunità aviaria
+                    'pR_sn', # startin_immune_fraction specie nota
 
+                    'b1_ca',
+                    'muB_ca',
+                    's_ca',
+                    'phi_ca',
+                    'niB_ca',
+                    'recB_ca') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
 
   if(con_cosa_inizio==0)
     nome_file_parametri=paste0(InLoc, FileName, "B_",
@@ -543,8 +608,11 @@ CheckMCMC_2spec = function(InLoc = "Output_WNV/MCMC/",
     plot(output_mcmc[,j],type="l",main=nomi_parametri_plot[j])
 }
 
-check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
-{
+check_birth_pulse = function(parms,
+                             tmin = 90,
+                             tmax = 210,
+                             quante_specie = 2)
+  {
   if (is.numeric(parms)) {
     with(as.list(parms), plot(muB * exp(-s * sin(pi * (seq(0,
                                                            365)/365 - phi[1]))^2)/besselI(s/2, 0,T), type = "l",
@@ -553,11 +621,29 @@ check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
   }
   if (is.character(parms)) {
     if (quante_specie == 1)
-      nomi_parametri = c("p", "B0", "pR", "b1", "muB",
-                         "s", "phi", "niB", "recB")
+      nomi_parametri= c('p', # starting_fraction comunità aviaria
+                        'B0', # uccelli_iniziali comunità aviaria
+                        'pR', # startin_immune_fraction comunità aviaria
+                        'b1',
+                        'muB',
+                        's',
+                        'phi',
+                        'niB',
+                        'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
     if (quante_specie == 2)
-      nomi_parametri = c("p", "p1", "B0", "B01", "pR",
-                         "pR1", "b1", "muB", "s", "phi", "niB", "recB")
+      nomi_parametri= c('p_ca', # starting_fraction comunità aviaria
+                        'p_sn', # starting_fraction specie nota
+                        'B0_ca', # uccelli_iniziali comunità aviaria
+                        'B0_sn', # uccelli_iniziali specie nota
+                        'pR_ca', # startin_immune_fraction comunità aviaria
+                        'pR_sn', # startin_immune_fraction specie nota
+
+                        'b1_ca',
+                        'muB_ca',
+                        's_ca',
+                        'phi_ca',
+                        'niB_ca',
+                        'recB_ca') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
     parametri_stimati = vector("list", length(nomi_parametri))
     matrix_birth_pulse = c()
     output_mcmc = read.table(parms)
@@ -567,15 +653,26 @@ check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
     burnin = nrow(output_mcmc) * 0.1
     for (j in 1:(ncol(output_mcmc) - 1)) parametri_stimati[[j]] = cbind(parametri_stimati[[j]],
                                                                         output_mcmc[-c(1:burnin), j])
-    for (j in which(nomi_parametri %in% c("muB", "phi", "s"))) matrix_birth_pulse = cbind(matrix_birth_pulse,
-                                                                                          parametri_stimati[[j]])
-    colnames(matrix_birth_pulse) = c("muB", "s", "phi")
-    birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
-      a["muB"] * exp(-a["s"] * sin(pi * (seq(0, 365)/365 -
-                                           a["phi"]))^2)/besselI(a["s"]/2, 0,T)
-    })
-    #matrix_birth_pulse[100, ]
-    #plot(birth_pulse[, 100], type = "l")
+    if(quante_specie == 1) {
+      for (j in which(nomi_parametri %in% c("muB", "phi", "s")))
+        matrix_birth_pulse = cbind(matrix_birth_pulse,
+                                   parametri_stimati[[j]])
+      colnames(matrix_birth_pulse) = c("muB", "s", "phi")
+      birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
+        a["muB"] * exp(-a["s"] * sin(pi * (seq(0, 365)/365 -
+                                             a["phi"]))^2)/besselI(a["s"]/2, 0,T)
+      })
+    }
+    if(quante_specie == 2) {
+      for (j in which(nomi_parametri %in% c("muB_ca", "phi_ca", "s_ca")))
+        matrix_birth_pulse = cbind(matrix_birth_pulse,
+                                   parametri_stimati[[j]])
+      colnames(matrix_birth_pulse) = c("muB_ca", "s_ca", "phi_ca")
+      birth_pulse = apply(matrix_birth_pulse, MARGIN = 1, function(a) {
+        a["muB_ca"] * exp(-a["s_ca"] * sin(pi * (seq(0, 365)/365 -
+                                             a["phi_ca"]))^2)/besselI(a["s"]/2, 0,T)
+      })
+    }
     mean = apply(birth_pulse, MARGIN = 1, function(a) {
       mean(a, na.rm = T)
     })
@@ -586,8 +683,8 @@ check_birth_pulse = function (parms, tmin = 90, tmax = 210, quante_specie = 2)
       quantile(a, probs = 0.975, na.rm = T)
     })
     ymax = max(qmax, qmin, mean)
-    plot(0, col = "white", xlim = c(0, 366), ylim = c(0,
-                                                      ymax), xlab = "time", ylab = "birth_pulse", axes = T)
+    plot(0, col = "white", xlim = c(0, 366), ylim = c(0,ymax),
+         xlab = "time", ylab = "birth_pulse", axes = T)
     abline(v = c(tmin, tmax), lwd = 2, col = "yellow")
     lines(mean, lwd = 3, col = "black")
     poligono = cbind(x = c(1:length(mean), length(mean):1),

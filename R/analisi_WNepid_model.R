@@ -48,9 +48,15 @@ WN_MCMC_and_Simu <- function(seed=0,
                              NameOutDyn = "dynamics_"
 
 ){
-  nomi_parametri=c("p","B0","pR","b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p', # starting_fraction
+                    'B0', # uccelli_iniziali
+                    'pR', # startin_immune_fraction (pR?)
+                    'b1',
+                    'muB',
+                    's',
+                    'phi',
+                    'niB',
+                    'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
   numero_catture=length(scan(vettore_date_catture,quiet=T))
 
   cluster_simulati=numero_cluster
@@ -139,16 +145,15 @@ WNV_ParPlotFunc <- function(anno_inizio,
                      FileAllParmsName="parametri_",
                      FileParmsPerSimuName="per_simulazione_"
 ) {
-  nomi_parametri=c("p",
-                   "B0",
-                   "pR",
-                   "b1",
-                   'niB',
-                   'recoveryB',
-                   'b0',
-                   's',
-                   'phi')
-
+  nomi_parametri= c('p', # starting_fraction
+                    'B0', # uccelli_iniziali
+                    'pR', # startin_immune_fraction (pR?)
+                    'b1',
+                    'muB',
+                    's',
+                    'phi',
+                    'niB',
+                    'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
   for(anno in anno_inizio:anno_fine){
 
     parametri_stimati=vector("list", length(nomi_parametri))
@@ -468,9 +473,15 @@ CheckMCMC = function(InLoc = "Output_WNV/MCMC/",
                      OutLoc = "Output_WNV/MCMC/Plots/",
                      OutFileName = "Check_Lik_",
                      con_cosa_inizio = 1){
-  nomi_parametri=c("p","B0","pR","b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p', # starting_fraction
+                    'B0', # uccelli_iniziali
+                    'pR', # startin_immune_fraction (pR?)
+                    'b1',
+                    'muB',
+                    's',
+                    'phi',
+                    'niB',
+                    'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
 
 
   if(con_cosa_inizio==0)
@@ -523,9 +534,15 @@ Simu4Sens <- function(seed=0,
 
 ){
   numero_catture=length(scan(vettore_date_catture,quiet=T))
-  nomi_parametri=c("p","B0","pR","b1",# "b2",
-                   "muB",
-                   "s", "phi", "niB", "recB")
+  nomi_parametri= c('p', # starting_fraction
+                    'B0', # uccelli_iniziali
+                    'pR', # startin_immune_fraction (pR?)
+                    'b1',
+                    'muB',
+                    's',
+                    'phi',
+                    'niB',
+                    'recB') # vecchi: c("p","B0","pR","b1",# "b2", "muB", "s", "phi", "niB", "recB")
 
   cluster_simulati=numero_cluster
 
