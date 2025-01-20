@@ -7,10 +7,10 @@ library(factoextra) # clustering algorithms & visualization
 library(readxl) #to import dataset from excel
 
 #import the dataset containing birds' demographic parameters
-uccelli <- read_excel("/home/nicolaferrari/Scrivania/Progetto_WN_Uccelli/Birds/birds_demographic_dataset.xlsx", 
+uccelli <- read_excel('V1_Sept/Birds_data/birds_demographic_dataset.xlsx', #"/home/nicolaferrari/Scrivania/Progetto_WN_Uccelli/Birds/birds_demographic_dataset.xlsx",
                      sheet = "Demo")
 
-#eliminate the first column of the dataset containing bird species names 
+#eliminate the first column of the dataset containing bird species names
 mydata<-uccelli[,c(-1)]
 
 #scale the data
@@ -23,13 +23,13 @@ dist.euc <- get_dist(df, method = "euclidean") #to use other method change "eucl
 fviz_dist(dist.euc, gradient = list(low='#00AFBB', mid='white', high='#FC4E07'))
 
  #####pearson correlation matrix
-data.cor <- get_dist(x = df, 
+data.cor <- get_dist(x = df,
                      method = "kendall")
 fviz_dist(data.cor, gradient = list(low='#00AFBB', mid='white', high='#FC4E07'))
 
 
 
-#cluster analysis with 3 clusters 
+#cluster analysis with 3 clusters
 k2 <- kmeans(df, centers = 3, nstart = 25)
 str(k2)
 k2
@@ -65,7 +65,7 @@ grid.arrange(p1, p2, p3, p4, nrow = 2)
 
 set.seed(123)
 
-# function to compute total within-cluster sum of square 
+# function to compute total within-cluster sum of square
 wss <- function(k) {
   kmeans(df, k, nstart = 10 )$tot.withinss
 }
@@ -77,7 +77,7 @@ k.values <- 1:12
 wss_values <- map_dbl(k.values, wss)
 
 plot(k.values, wss_values,
-     type="b", pch = 19, frame = FALSE, 
+     type="b", pch = 19, frame = FALSE,
      xlab="Number of clusters K",
      ylab="Total within-clusters sum of squares")
 
@@ -100,7 +100,7 @@ k.values <- 2:12
 avg_sil_values <- map_dbl(k.values, avg_sil)
 
 plot(k.values, avg_sil_values,
-     type = "b", pch = 19, frame = FALSE, 
+     type = "b", pch = 19, frame = FALSE,
      xlab = "Number of clusters K",
      ylab = "Average Silhouettes")
 
@@ -133,4 +133,4 @@ mean_data<- mydata %>%
 view (mean_data)
 
 write.table(mean_data,file="C:/Users/Utente/Desktop/PCA/medie_prova_nuovo+epi3.csv",sep=";", dec=",", quote=FALSE, row.names=FALSE)
- 
+
