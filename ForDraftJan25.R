@@ -75,6 +75,48 @@ ggplot() +
   geom_line(data = ntdf, aes(x = time, y = nt), linewidth =1.2, color = '#4DAF4A') +
   geom_vline(xintercept = 241)
 
+# birth function for the species considered
+muB_black = 0.013 # 0.007874999
+s_black = 6 # 11.83775
+phi_black = 0.35 # 0.4 # 0.5878114
+
+muB_mag = 0.0075 # 0.007874999
+s_mag = 6 # 11.83775
+phi_mag = 0.4 # 0.4 # 0.5878114
+
+muB_mall = 0.014 # 0.007874999
+s_mall = 10 # 11.83775
+phi_mall = 0.33 # 0.4 # 0.5878114
+
+ntdf = data.frame(time = seq(1, 365)) %>%
+  mutate(nt_black = muB_black * exp(-s_black * sin(pi * (time/365 - phi_black))^2)/besselI(s_black/2, 0, T),
+         nt_mag = muB_mag * exp(-s_mag * sin(pi * (time/365 - phi_mag))^2)/besselI(s_mag/2, 0, T),
+         nt_mall = muB_mall * exp(-s_mall * sin(pi * (time/365 - phi_mall))^2)/besselI(s_mall/2, 0, T))
+
+ggplot() +
+  geom_line(data = ntdf, aes(x = time, y = nt_black), linewidth =1.2, color = '#FC8D62') +
+  geom_line(data = ntdf, aes(x = time, y = nt_mag), linewidth =1.2, color = '#66C2A5') +
+  geom_line(data = ntdf, aes(x = time, y = nt_mall), linewidth =1.2, color = '#8DA0CB') +
+  theme_minimal() +
+  labs(
+    x = "",          # Custom x-axis label
+    y = ''        # Custom y-axis label
+  ) +
+  scale_color_manual(values = custom_colors) +  # Apply custom colors
+  theme(plot.title = element_text(size = rel(2), hjust = 0.5),
+        axis.title = element_text(size = rel(1.4)),
+        axis.text = element_text(size = rel(1.2)),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.ticks = element_line(size = 0.5),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none",
+        plot.margin = unit(c(0.5, 1, 0.1, 0.1), "cm")) +
+  # ggtitle(anno) +
+  scale_x_continuous(limits = c(1,365),
+                     breaks = seq(1,365, length.out = 12),
+                     labels = format(as.Date(seq(1,365, length.out = 12), origin = "2016-01-01"),
+                                     "%b %d"))
+
 
 # Valori parametri usati (da MCMC) ----
 UnknParms = read.table('V1_Sept/WNModFEMRL/Output_WNV/MCMC/parametri_MediaAllYears.txt')
@@ -2212,9 +2254,11 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Merli/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
+
 
 sel_MS = seq(1, nrow(simu), 11)
-
 sel_ME = seq(2, nrow(simu), 11)
 sel_MI = seq(3, nrow(simu), 11)
 sel_BS = seq(4, nrow(simu), 11)
@@ -2251,9 +2295,21 @@ pr = data.frame(t((b11_merlo*BI/pop_tot)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
+
 
 p2016B = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#FC8D62', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#FC8D62", alpha = 0.3) +
   theme_minimal() +
@@ -2285,6 +2341,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Merli/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2323,9 +2381,20 @@ pr = data.frame(t((b11_merlo*BI/pop_tot)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2017B = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#FC8D62', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#FC8D62", alpha = 0.3) +
   theme_minimal() +
@@ -2357,6 +2426,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Merli/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2395,9 +2466,20 @@ pr = data.frame(t((b11_merlo*BI/pop_tot)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_merlo*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2018B = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#FC8D62', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#FC8D62", alpha = 0.3) +
   theme_minimal() +
@@ -2432,6 +2514,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Gazze/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2470,9 +2554,20 @@ pr = data.frame(t((b11_gazza*BI/pop_tot)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2016M = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#66C2A5', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#66C2A5", alpha = 0.3) +
   theme_minimal() +
@@ -2504,6 +2599,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Gazze/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2542,9 +2639,20 @@ pr = data.frame(t((b11_gazza*BI/pop_tot)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2017M = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#66C2A5', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#66C2A5", alpha = 0.3) +
   theme_minimal() +
@@ -2577,6 +2685,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Gazze/Simulaz
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2615,9 +2725,20 @@ pr = data.frame(t((b11_gazza*BI/pop_tot)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_gazza*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2018M = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#66C2A5', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#66C2A5", alpha = 0.3) +
   theme_minimal() +
@@ -2645,6 +2766,7 @@ ggarrange(p2016M, p2017M, p2018M,  common.legend = F, ncol = 3, labels = NULL)
 # 1300x400
 
 # Germani ----
+# b11_germano = 0.35 #usa biting rate specie nota (questo è dei germani perchè è l'ultima specie che hai simu)
 anno = 2016
 output_mcmc = read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/MCMC/parametri_2spec_Germani_M_', anno,
                                 '_1.txt'))
@@ -2653,6 +2775,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/Simul
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2691,9 +2815,20 @@ pr = data.frame(t((b11_germano*BI/pop_tot)/((b11_germano*BI/pop_tot)+(b1*BI2/pop
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_germano*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2016G = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#8DA0CB', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#8DA0CB", alpha = 0.3) +
   theme_minimal() +
@@ -2719,13 +2854,15 @@ p2016G = pr %>%
                      labels = format(as.Date(seq(0,180, length.out = 10)+120, origin = "2016-01-01"),
                                      "%b %d")) +
 
-  ylim(0,100) +
+  ylim(0,100) # +
   scale_y_break(breaks = c(1.025, 99.45),
                 scale = 0.5, # 'free' 'fixed',
                 ticklabels = c(0, 1, 99.5, 100),
                 space = 0.1)
 
-p2016G
+p2016G +
+  ylim(0,1)
+
 
 anno = 2017
 output_mcmc = read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/MCMC/parametri_2spec_Germani_M_', anno,
@@ -2735,6 +2872,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/Simul
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2773,9 +2912,20 @@ pr = data.frame(t((b11_germano*BI/pop_tot)/((b11_germano*BI/pop_tot)+(b1*BI2/pop
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_germano*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2017G = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#8DA0CB', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#8DA0CB", alpha = 0.3) +
   theme_minimal() +
@@ -2801,13 +2951,13 @@ p2017G = pr %>%
                      labels = format(as.Date(seq(0,180, length.out = 10)+120, origin = "2016-01-01"),
                                      "%b %d")) +
 
-  ylim(0,100) +
+  ylim(0,100) # +
   scale_y_break(breaks = c(1.025, 99.45),
                 scale = 0.5, # 'free' 'fixed',
                 ticklabels = c(0, 1, 99.5, 100),
                 space = 0.1)
 
-p2017G
+p2017G + ylim(0,2)
 
 anno = 2018
 output_mcmc = read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/MCMC/parametri_2spec_Germani_M_', anno,
@@ -2817,6 +2967,8 @@ simu = data.frame(read.table(paste0('V1_Sept/WNModFEMRL/Output_WNV/Germani/Simul
 colnames(output_mcmc) = c("p_ca", "p_sn", "B0_ca", "B0_sn", "pR_ca",
                           "pR_sn", "b1_ca", "muB_ca", "s_ca", "phi_ca",
                           "niB_ca", "recB_ca")
+plot((mean(output_mcmc[, 'muB_ca']) * exp(-mean(output_mcmc[, 's_ca'])) * sin(pi * (seq(0,365)/365 - mean(output_mcmc[, 'phi_ca'])))^2)/(besselI(mean(output_mcmc[, 's_ca'])/2, 0, T)),
+     type = 'l')
 
 sel_MS = seq(1, nrow(simu), 11)
 sel_ME = seq(2, nrow(simu), 11)
@@ -2855,9 +3007,20 @@ pr = data.frame(t((b11_germano*BI/pop_tot)/((b11_germano*BI/pop_tot)+(b1*BI2/pop
   select(yday, Mean, Qmin, Qmax)
 min(pr$Mean)*100
 max(pr$Mean)*100
+pr2 = data.frame(t((b1*BI2/pop_tot2)/((b11_germano*BI/pop_tot)+(b1*BI2/pop_tot2)))) %>%
+  mutate(yday = seq(1, 180)) %>%
+  rowwise() %>%
+  mutate(Mean = mean(c_across(1:100), na.rm = TRUE),
+         Qmin = quantile(c_across(1:100), probs = 0.025),
+         Qmax = quantile(c_across(1:100), probs = 0.975)) %>%
+  select(yday, Mean, Qmin, Qmax)
 
 p2018G = pr %>%
   ggplot() +
+  geom_line(data = pr2,
+            aes(yday, Mean*100), color = 'grey', linewidth = rel(1.2), linetype = 2) +
+  geom_ribbon(data = pr2,
+              aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "grey", alpha = 0.3) +
   geom_line(aes(yday, Mean*100), color = '#8DA0CB', linewidth = rel(1.2)) +
   geom_ribbon(aes(x = yday, ymin = Qmin*100, ymax = Qmax*100), fill = "#8DA0CB", alpha = 0.3) +
   theme_minimal() +
@@ -2883,7 +3046,7 @@ p2018G = pr %>%
                      labels = format(as.Date(seq(0,180, length.out = 10)+120, origin = "2016-01-01"),
                                      "%b %d")) +
 
-  ylim(0,100) +
+  ylim(0,100) # +
   scale_y_break(breaks = c(2.05, 99.45),
                 scale = 0.5, # 'free' 'fixed',
                 ticklabels = c(0, 2, 99.5, 100),
